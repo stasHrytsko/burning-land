@@ -3,35 +3,63 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Брандмауэр — прототип</title>
+<title>Брандмауэр</title>
 <style>
   :root{
-    --night:#15100C; --night-2:#211811;
-    --grass:#2C2A1E; --grass-2:#332F20;
-    --sand:#EDE2C8; --sand-dim:#9C8E72;
-    --wall:#8A6A48; --wall-top:#A6855C;
-    --fire:#E5532B; --fire-2:#F2933C; --ember:#7A2A14;
-    --house:#3FB6A0; --house-lost:#5a4a40;
-    --line:#3D3122; --amber:#F2A33C;
+    --night:#15100C;--night-2:#211811;
+    --grass:#2C2A1E;--grass-2:#332F20;
+    --sand:#EDE2C8;--sand-dim:#9C8E72;
+    --wall:#8A6A48;
+    --fire:#E5532B;--fire-2:#F2933C;--ember:#7A2A14;
+    --house:#3FB6A0;--house-lost:#5a4a40;
+    --line:#3D3122;--amber:#F2A33C;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
-  body{background:var(--night);color:var(--sand);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    display:flex;flex-direction:column;align-items:center;min-height:100dvh;overflow:hidden;user-select:none;-webkit-user-select:none}
-  #app{width:100%;max-width:430px;min-height:100dvh;display:flex;flex-direction:column;padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
+  body{background:var(--night);color:var(--sand);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    display:flex;flex-direction:column;align-items:center;
+    min-height:100dvh;overflow:hidden;user-select:none;-webkit-user-select:none}
 
+  /* ── Level Select ── */
+  #lvlScreen{
+    position:fixed;inset:0;z-index:100;background:var(--night);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:28px 24px
+  }
+  #lvlScreen.hidden{display:none}
+  .ls-title{font-size:28px;font-weight:800;letter-spacing:.06em;margin-bottom:4px}
+  .ls-sub{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:32px}
+  .lvl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:320px}
+  .lvl-btn{
+    aspect-ratio:1;border-radius:16px;border:1px solid var(--line);background:var(--night-2);
+    cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    transition:transform .1s,border-color .12s
+  }
+  .lvl-btn:active{transform:scale(.91)}
+  .lvl-btn .n{font-size:30px;font-weight:800;font-family:ui-monospace,Menlo,monospace}
+  .lvl-btn .d{font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+  .lvl-btn.easy .n{color:var(--sand)}.lvl-btn.easy .d{color:#5ab05a}.lvl-btn.easy{border-color:#2e4a2e}
+  .lvl-btn.med  .n{color:var(--sand)}.lvl-btn.med  .d{color:var(--amber)}.lvl-btn.med{border-color:#4a3a14}
+  .lvl-btn.hard .n{color:var(--fire-2)}.lvl-btn.hard .d{color:var(--fire)}.lvl-btn.hard{border-color:#4a1e14}
+
+  /* ── Game ── */
+  #app{width:100%;max-width:430px;min-height:100dvh;display:flex;flex-direction:column;
+    padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
   .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-  .ttl{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--sand-dim)}
+  .back{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--sand-dim);
+    cursor:pointer;padding:4px 0}
+  .back span{color:var(--amber)}
   .stats{display:flex;gap:14px;font-size:13px}
   .stats .v{font-family:ui-monospace,Menlo,monospace;font-weight:800;font-variant-numeric:tabular-nums}
-  .stats .house .v{color:var(--house)} .stats .turn .v{color:var(--amber)}
-  .warn{font-size:12px;color:var(--fire-2);text-align:center;height:16px;margin-bottom:6px;transition:opacity .2s}
+  .stats .house .v{color:var(--house)}.stats .turn .v{color:var(--amber)}
+  .warn{font-size:12px;color:var(--fire-2);text-align:center;height:16px;margin-bottom:6px}
 
   #board{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;background:var(--night-2);
     border:1px solid var(--line);border-radius:12px;padding:7px;margin-bottom:12px;touch-action:none}
   .c{aspect-ratio:1;border-radius:5px;background:var(--grass);position:relative;
     display:flex;align-items:center;justify-content:center;font-size:clamp(13px,4.4vw,20px);
-    transition:background .12s, transform .06s}
+    transition:background .12s,transform .06s}
   .c:nth-child(even){background:var(--grass-2)}
   .c.ghost{background:#4a4326;box-shadow:inset 0 0 0 2px var(--amber)}
   .c.ghost-bad{background:#46291f;box-shadow:inset 0 0 0 2px var(--fire)}
@@ -40,69 +68,79 @@
   .c.fire{background:radial-gradient(circle at 50% 65%,var(--fire-2),var(--fire) 60%,var(--ember));animation:flick .5s ease-in-out infinite alternate}
   @keyframes flick{from{filter:brightness(1)}to{filter:brightness(1.18)}}
   .c.burnt{background:#1c1611}
-  .c.willburn::after{content:'';position:absolute;inset:34%;border-radius:50%;border:2px dashed var(--fire-2);opacity:.8;animation:pulse 1s ease-in-out infinite}
+  .c.willburn::after{content:'';position:absolute;inset:34%;border-radius:50%;
+    border:2px dashed var(--fire-2);opacity:.8;animation:pulse 1s ease-in-out infinite}
   @keyframes pulse{0%,100%{transform:scale(.85);opacity:.5}50%{transform:scale(1.15);opacity:.95}}
   .c .ico{position:relative;z-index:2;pointer-events:none}
   .c.house-lost{background:var(--house-lost)}
 
-  /* tray */
   .tray{margin-bottom:10px}
-  .tray-lbl{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sand-dim);margin-bottom:6px}
+  .tray-lbl{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--sand-dim);margin-bottom:6px}
   .pieces{display:flex;gap:8px;align-items:flex-end;min-height:72px}
-  .piece{background:var(--night-2);border:1px solid var(--line);border-radius:10px;padding:7px;cursor:pointer;
-    transition:transform .1s, border-color .1s, opacity .2s;flex:1;display:flex;justify-content:center;align-items:center}
+  .piece{background:var(--night-2);border:1px solid var(--line);border-radius:10px;padding:7px;
+    cursor:pointer;transition:transform .1s,border-color .1s,opacity .2s;
+    flex:1;display:flex;justify-content:center;align-items:center}
   .piece.sel{border-color:var(--amber);transform:translateY(-3px);background:#2a2114}
-  .piece.next{opacity:.4;flex:.7}
+  .piece.next{opacity:.4;flex:.7;cursor:default}
   .piece .mini{display:grid;gap:2px}
   .piece .mini i{width:11px;height:11px;border-radius:2px;background:var(--wall);display:block}
   .piece .mini i.e{background:transparent}
   .sep{width:1px;background:var(--line);align-self:stretch;margin:4px 2px}
 
-  .btn{width:100%;border:none;border-radius:13px;padding:13px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:transform .08s}
-  .btn:active{transform:scale(.97)}
-  .btn-ghost{background:transparent;color:var(--sand-dim);border:1px solid var(--line)}
-  .btn-go{background:var(--amber);color:#2e1d00}
   .row{display:flex;gap:8px}
+  .btn{width:100%;border:none;border-radius:13px;padding:13px;font-size:15px;font-weight:800;
+    font-family:inherit;cursor:pointer;transition:transform .08s}
+  .btn:active{transform:scale(.97)}
+  .btn-dim{background:transparent;color:var(--sand-dim);border:1px solid var(--line)}
+  .btn-go{background:var(--amber);color:#2e1d00}
 
-  .ovl{position:fixed;inset:0;background:rgba(12,8,5,.88);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:22px;z-index:50;animation:fade .25s}
+  .ovl{position:fixed;inset:0;background:rgba(12,8,5,.88);backdrop-filter:blur(3px);
+    display:flex;align-items:center;justify-content:center;padding:22px;z-index:50;animation:fade .25s}
   @keyframes fade{from{opacity:0}to{opacity:1}}
-  .card{width:100%;max-width:340px;background:var(--night-2);border:1px solid var(--line);border-radius:18px;padding:24px 20px;text-align:center}
+  .card{width:100%;max-width:340px;background:var(--night-2);border:1px solid var(--line);
+    border-radius:18px;padding:24px 20px;text-align:center}
   .card h2{font-size:21px;margin-bottom:8px}
   .card p{font-size:14px;line-height:1.5;color:var(--sand-dim);margin-bottom:8px}
   .card p b{color:var(--sand)}
   .card .big{font-size:34px;font-weight:800;font-family:ui-monospace,Menlo,monospace;margin:6px 0 12px}
-  .ok{color:var(--house)} .bad{color:var(--fire)}
+  .card .btns{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .ok{color:var(--house)}.bad{color:var(--fire)}
   .rules{text-align:left;font-size:13.5px;line-height:1.55;color:var(--sand-dim);margin:14px 0 18px}
   .rules div{margin-bottom:9px;display:flex;gap:9px}
   .rules .i{flex:0 0 22px;text-align:center}
-  .title{font-size:25px;font-weight:800;letter-spacing:.04em}
-  .subtitle{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
+  .gtitle{font-size:25px;font-weight:800;letter-spacing:.04em}
+  .gsub{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
 </style>
 </head>
 <body>
+
+<!-- Level Select Screen -->
+<div id="lvlScreen">
+  <div class="ls-title">БРАНДМАУЭР</div>
+  <div class="ls-sub">Выбери уровень</div>
+  <div class="lvl-grid" id="lvlGrid"></div>
+</div>
+
 <div id="app">
   <div class="top">
-    <div class="ttl">Брандмауэр</div>
+    <div class="back" id="backBtn">← УР. <span id="lvlNum">1</span></div>
     <div class="stats">
       <div class="house">🏠 <span class="v" id="houses">0</span></div>
       <div class="turn">Ход <span class="v" id="turn">1</span></div>
     </div>
   </div>
   <div class="warn" id="warn"></div>
-
   <div id="board"></div>
-
   <div class="tray">
-    <div class="tray-lbl"><span>Стенки — поставь одну</span><span id="pass"></span></div>
+    <div class="tray-lbl"><span>Стенки — поставь одну</span><span>в очереди: 3</span></div>
     <div class="pieces" id="pieces"></div>
   </div>
-
   <div class="row">
-    <button class="btn btn-ghost" id="rotateBtn">⟳ Повернуть</button>
-    <button class="btn btn-ghost" id="restartBtn">Заново</button>
+    <button class="btn btn-dim" id="rotateBtn">⟳ Повернуть</button>
+    <button class="btn btn-dim" id="restartBtn">Заново</button>
   </div>
 </div>
-
 <div id="ovl"></div>
 
 <script>
@@ -112,47 +150,108 @@ const $=id=>document.getElementById(id);
 const board=$('board');
 const rnd=n=>Math.random()*n|0;
 
-// piece shapes (relative cells)
+// 9 levels: 3 easy / 3 medium / 3 hard
+// seeds=fire starts, houses=homes to protect, minDist=min manhattan dist seed→house, central=seeds in middle
+const LEVELS=[
+  {seeds:1,houses:2,minDist:5,central:false}, // 1 easy
+  {seeds:1,houses:2,minDist:4,central:false}, // 2
+  {seeds:1,houses:3,minDist:4,central:false}, // 3
+  {seeds:2,houses:3,minDist:3,central:false}, // 4 medium
+  {seeds:2,houses:4,minDist:3,central:false}, // 5
+  {seeds:2,houses:4,minDist:2,central:false}, // 6
+  {seeds:3,houses:4,minDist:2,central:true},  // 7 hard
+  {seeds:3,houses:5,minDist:2,central:true},  // 8
+  {seeds:3,houses:5,minDist:1,central:true},  // 9
+];
+
+// Build 3×3 level select grid
+const lvlGrid=$('lvlGrid');
+LEVELS.forEach((lv,i)=>{
+  const row=i/3|0;
+  const cls=row===0?'easy':row===1?'med':'hard';
+  const label=row===0?'Легко':row===1?'Средне':'Сложно';
+  const btn=document.createElement('button');
+  btn.className=`lvl-btn ${cls}`;
+  btn.innerHTML=`<span class="n">${i+1}</span><span class="d">${label}</span>`;
+  btn.addEventListener('pointerdown',()=>pickLevel(i));
+  lvlGrid.appendChild(btn);
+});
+
+function pickLevel(idx){
+  $('lvlScreen').classList.add('hidden');
+  start(idx);
+  showIntro();
+}
+
+// ── shapes ──
 const SHAPES=[
-  [[0,0],[0,1]],                 // domino
-  [[0,0],[0,1],[0,2]],           // I3
-  [[0,0],[0,1],[1,0]],           // corner L
-  [[0,0],[0,1],[1,0],[1,1]],     // square
-  [[0,0],[0,1],[0,2],[1,0]],     // J
-  [[0,0],[0,1],[1,1],[1,2]],     // S
-  [[0,0],[0,1],[0,2],[1,1]],     // T
-  [[0,0]],                        // single (rare)
+  [[0,0],[0,1]],
+  [[0,0],[0,1],[0,2]],
+  [[0,0],[0,1],[1,0]],
+  [[0,0],[0,1],[1,0],[1,1]],
+  [[0,0],[0,1],[0,2],[1,0]],
+  [[0,0],[0,1],[1,1],[1,2]],
+  [[0,0],[0,1],[0,2],[1,1]],
+  [[0,0]],
 ];
 function randShape(){
   const r=Math.random();
-  const pool=r<.12?[[[0,0]]]:SHAPES.slice(0,7);
+  const pool=r<.1?[SHAPES[7]]:SHAPES.slice(0,7);
   return pool[rnd(pool.length)].map(p=>[...p]);
 }
-function rotate(cells){ // 90deg
+function rotate(cells){
   const r=cells.map(([y,x])=>[x,-y]);
-  const miny=Math.min(...r.map(p=>p[0])),minx=Math.min(...r.map(p=>p[1]));
-  return r.map(([y,x])=>[y-miny,x-minx]);
+  const my=Math.min(...r.map(p=>p[0])),mx=Math.min(...r.map(p=>p[1]));
+  return r.map(([y,x])=>[y-my,x-mx]);
 }
 
-let S=null;
-function start(){
-  // grid: 0 grass,1 wall,2 fire,3 burnt
+// Returns the offset to center a shape on the touched cell
+function centerOffset(shape){
+  const maxY=Math.max(...shape.map(([y])=>y));
+  const maxX=Math.max(...shape.map(([,x])=>x));
+  return [maxY>>1, maxX>>1];
+}
+
+let S=null, curLevel=0;
+
+function start(lvIdx){
+  if(lvIdx!=null) curLevel=lvIdx;
+  const lv=LEVELS[curLevel];
+  $('lvlNum').textContent=curLevel+1;
+
   const grid=Array.from({length:N},()=>Array(N).fill(0));
-  // 2 fire seeds near edges/corners
-  const seeds=[[0,rnd(3)],[N-1,N-1-rnd(3)]];
-  seeds.forEach(([r,c])=>grid[r][c]=2);
-  // houses: 3-4 placed away from seeds
+
+  // Place fire seeds
+  const seeds=[];
+  let t=0;
+  while(seeds.length<lv.seeds&&t++<200){
+    let r,c;
+    if(lv.central){
+      r=2+rnd(N-4);c=2+rnd(N-4);
+    }else{
+      const e=rnd(4);
+      if(e===0){r=rnd(2);c=rnd(3);}
+      else if(e===1){r=N-1-rnd(2);c=N-1-rnd(3);}
+      else if(e===2){r=rnd(3);c=N-1-rnd(2);}
+      else{r=N-1-rnd(3);c=rnd(2);}
+    }
+    if(grid[r][c]!==0)continue;
+    if(seeds.some(s=>Math.abs(s[0]-r)+Math.abs(s[1]-c)<3))continue;
+    seeds.push([r,c]);grid[r][c]=2;
+  }
+
+  // Place houses
   const houses=[];
-  let tries=0;
-  while(houses.length<4&&tries++<200){
-    const r=2+rnd(N-4),c=1+rnd(N-2);
+  t=0;
+  while(houses.length<lv.houses&&t++<300){
+    const r=1+rnd(N-2),c=1+rnd(N-2);
     if(grid[r][c]!==0)continue;
     if(houses.some(h=>Math.abs(h[0]-r)+Math.abs(h[1]-c)<2))continue;
-    if(seeds.some(s=>Math.abs(s[0]-r)+Math.abs(s[1]-c)<3))continue;
+    if(seeds.some(s=>Math.abs(s[0]-r)+Math.abs(s[1]-c)<lv.minDist))continue;
     houses.push([r,c]);
   }
-  S={grid,houses,turn:1,tray:[randShape(),randShape(),randShape(),randShape(),randShape(),randShape()],
-     sel:0,over:false,ghost:null};
+
+  S={grid,houses,turn:1,tray:Array.from({length:6},randShape),sel:0,over:false,ghost:null};
   buildBoard();renderTray();render();
 }
 
@@ -161,35 +260,53 @@ function buildBoard(){
   for(let r=0;r<N;r++)for(let c=0;c<N;c++){
     const d=document.createElement('div');
     d.className='c';d.dataset.r=r;d.dataset.c=c;
-    d.addEventListener('pointerenter',()=>hover(r,c));
-    d.addEventListener('pointerdown',()=>{hover(r,c);placeSel(r,c)});
     board.appendChild(d);
   }
 }
+
+// Board events added once — survive rebuilds
+board.addEventListener('pointermove', onBoardPtr, {passive:true});
+board.addEventListener('pointerdown', onBoardPtr);
+board.addEventListener('pointerup',   onBoardUp);
+board.addEventListener('pointerleave',()=>{if(S){S.ghost=null;render();}});
+
+// Use elementFromPoint so touch-drag reliably hits the right cell
+function cellFromEvent(e){
+  const el=document.elementFromPoint(e.clientX,e.clientY);
+  if(!el)return null;
+  const c=el.closest?.('.c')||el;
+  return (c&&c.dataset&&c.dataset.r!=null)?[+c.dataset.r,+c.dataset.c]:null;
+}
+
+function anchorFor(pr,pc){
+  const[oy,ox]=centerOffset(S.tray[S.sel]);
+  return[pr-oy,pc-ox];
+}
+
+function onBoardPtr(e){
+  if(!S||S.over)return;
+  const pos=cellFromEvent(e);if(!pos)return;
+  const[ar,ac]=anchorFor(pos[0],pos[1]);
+  S.ghost=[S.tray[S.sel],ar,ac];
+  render();
+}
+function onBoardUp(e){
+  if(!S||S.over)return;
+  const pos=cellFromEvent(e);if(!pos)return;
+  const[ar,ac]=anchorFor(pos[0],pos[1]);
+  if(!canPlace(S.tray[S.sel],ar,ac))return;
+  cellsFor(S.tray[S.sel],ar,ac).forEach(([y,x])=>S.grid[y][x]=1);
+  S.tray.splice(S.sel,1);S.tray.push(randShape());
+  S.sel=0;S.ghost=null;
+  spreadFire();
+}
+
 const cellAt=(r,c)=>board.children[r*N+c];
 const isHouse=(r,c)=>S.houses.some(h=>h[0]===r&&h[1]===c);
-
 function cellsFor(shape,r,c){return shape.map(([dy,dx])=>[r+dy,c+dx])}
 function canPlace(shape,r,c){
   return cellsFor(shape,r,c).every(([y,x])=>
     y>=0&&y<N&&x>=0&&x<N&&S.grid[y][x]===0&&!isHouse(y,x));
-}
-
-function hover(r,c){
-  if(S.over)return;
-  S.ghost=[S.tray[S.sel],r,c];
-  render();
-}
-function placeSel(r,c){
-  if(S.over)return;
-  const shape=S.tray[S.sel];
-  if(!canPlace(shape,r,c))return;
-  cellsFor(shape,r,c).forEach(([y,x])=>S.grid[y][x]=1);
-  // consume piece, shift queue, draw new
-  S.tray.splice(S.sel,1);
-  S.tray.push(randShape());
-  S.sel=0;S.ghost=null;
-  spreadFire();
 }
 
 function spreadFire(){
@@ -202,25 +319,13 @@ function spreadFire(){
     });
   }
   add.forEach(([y,x])=>S.grid[y][x]=2);
-  // house hit?
-  const lost=S.houses.find(h=>S.grid[h[0]][h[1]]===2);
-  if(lost){S.over='lose';render();setTimeout(()=>finish(false),500);return}
-  // fire fully contained?
-  if(add.length===0&&!anyFireCanGrow()){S.over='win';render();setTimeout(()=>finish(true),500);return}
-  S.turn++;
-  render();renderTray();
-}
-function anyFireCanGrow(){
-  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
-    if(S.grid[r][c]!==2)continue;
-    for(const[dy,dx]of[[1,0],[-1,0],[0,1],[0,-1]]){
-      const y=r+dy,x=c+dx;
-      if(y>=0&&y<N&&x>=0&&x<N&&S.grid[y][x]===0)return true;
-    }
+  if(S.houses.some(h=>S.grid[h[0]][h[1]]===2)){
+    S.over='lose';render();setTimeout(()=>finish(false),500);return;
   }
-  return false;
+  if(add.length===0){S.over='win';render();setTimeout(()=>finish(true),500);return;}
+  S.turn++;render();renderTray();
 }
-// cells that will catch fire on the NEXT fire step (preview)
+
 function nextBurn(){
   const set=new Set();
   for(let r=0;r<N;r++)for(let c=0;c<N;c++){
@@ -235,8 +340,7 @@ function nextBurn(){
 
 function render(){
   const burn=nextBurn();
-  const ghostCells=new Set();
-  let ghostOk=true;
+  const ghostCells=new Set();let ghostOk=true;
   if(S.ghost){
     const[sh,r,c]=S.ghost;
     ghostOk=canPlace(sh,r,c);
@@ -252,7 +356,6 @@ function render(){
     if(!S.over&&v===0&&burn.has(k)&&!ghostCells.has(k))cls+=' willburn';
     if(ghostCells.has(k))cls+=ghostOk?' ghost':' ghost-bad';
     d.className=cls;
-    // icon
     let ico='';
     if(isHouse(r,c))ico=S.grid[r][c]===2?'🔥':'🏠';
     else if(v===2)ico='🔥';
@@ -260,20 +363,17 @@ function render(){
   }
   $('houses').textContent=S.houses.filter(h=>S.grid[h[0]][h[1]]!==2).length+'/'+S.houses.length;
   $('turn').textContent=S.turn;
-  const warn=$('warn');
-  const threat=S.houses.some(h=>{
-    return [[1,0],[-1,0],[0,1],[0,-1]].some(([dy,dx])=>{
-      const y=h[0]+dy,x=h[1]+dx;
-      return y>=0&&y<N&&x>=0&&x<N&&S.grid[y][x]===2;
-    });
-  });
-  warn.textContent=threat?'⚠ Огонь у дома! Защити его этим ходом':'';
+  const threat=S.houses.some(h=>[[1,0],[-1,0],[0,1],[0,-1]].some(([dy,dx])=>{
+    const y=h[0]+dy,x=h[1]+dx;
+    return y>=0&&y<N&&x>=0&&x<N&&S.grid[y][x]===2;
+  }));
+  $('warn').textContent=threat?'⚠ Огонь у дома! Защити его этим ходом':'';
 }
 
 function renderTray(){
   const box=$('pieces');box.innerHTML='';
   S.tray.forEach((sh,i)=>{
-    if(i===3){const sep=document.createElement('div');sep.className='sep';box.appendChild(sep)}
+    if(i===3){const sep=document.createElement('div');sep.className='sep';box.appendChild(sep);}
     const active=i<3;
     const p=document.createElement('div');
     p.className='piece'+(active?'':' next')+(i===S.sel?' sel':'');
@@ -287,48 +387,64 @@ function renderTray(){
       mini.appendChild(cell);
     }
     p.appendChild(mini);
-    if(active)p.addEventListener('pointerdown',e=>{e.stopPropagation();S.sel=i;S.ghost=null;renderTray();render()});
+    if(active)p.addEventListener('pointerdown',e=>{
+      e.stopPropagation();S.sel=i;S.ghost=null;renderTray();render();
+    });
     box.appendChild(p);
   });
-  $('pass').textContent='в очереди: 3';
 }
 
-$('rotateBtn').onclick=()=>{if(S.over)return;S.tray[S.sel]=rotate(S.tray[S.sel]);S.ghost=null;renderTray();render()};
-$('restartBtn').onclick=()=>start();
-board.addEventListener('pointerleave',()=>{S.ghost=null;render()});
+$('rotateBtn').onclick=()=>{
+  if(!S||S.over)return;
+  S.tray[S.sel]=rotate(S.tray[S.sel]);S.ghost=null;renderTray();render();
+};
+$('restartBtn').onclick=()=>{if(S)start();};
+$('backBtn').onclick=()=>{$('lvlScreen').classList.remove('hidden');hide();};
 
 function finish(win){
   const saved=S.houses.filter(h=>S.grid[h[0]][h[1]]!==2).length;
   if(win){
     const score=saved*100+Math.max(0,(40-S.turn))*10;
+    const hasNext=curLevel<8;
     show(`<h2 class="ok">🛡 Огонь заперт!</h2>
       <div class="big ok">${score}</div>
-      <p>Спасено домов: <b>${saved}/${S.houses.length}</b>. Заперто за <b>${S.turn}</b> ходов — чем быстрее, тем больше очков.</p>
-      <button class="btn btn-go" id="go">Ещё пожар</button>`);
+      <p>Домов спасено: <b>${saved}/${S.houses.length}</b>. Ходов: <b>${S.turn}</b>.</p>
+      <div class="btns">
+        ${hasNext?`<button class="btn btn-go" id="btnNext">Уровень ${curLevel+2} →</button>`:''}
+        <button class="btn btn-dim" id="btnAgain">Ещё раз</button>
+        <button class="btn btn-dim" id="btnLvls">Все уровни</button>
+      </div>`);
+    if(hasNext)$('btnNext').onclick=()=>{hide();pickLevel(curLevel+1);};
   }else{
     show(`<h2 class="bad">🔥 Дом сгорел</h2>
       <div class="big bad">${saved}/${S.houses.length}</div>
-      <p>Огонь прорвался к дому. Видел, какие клетки загорятся, — где надо было ставить стенку?</p>
-      <button class="btn btn-go" id="go">Ещё раз</button>`);
+      <p>Огонь прорвался. Где надо было ставить стенку?</p>
+      <div class="btns">
+        <button class="btn btn-go" id="btnAgain">Ещё раз</button>
+        <button class="btn btn-dim" id="btnLvls">Все уровни</button>
+      </div>`);
   }
-  $('go').onclick=()=>{hide();start()};
+  $('btnAgain').onclick=()=>{hide();start();};
+  $('btnLvls').onclick=()=>{hide();$('lvlScreen').classList.remove('hidden');};
 }
+
 function showIntro(){
-  show(`<div class="subtitle">прототип</div><div class="title">БРАНДМАУЭР</div>
+  show(`<div class="gsub">Уровень ${curLevel+1}</div>
+    <div class="gtitle">БРАНДМАУЭР</div>
     <div class="rules">
       <div><span class="i">🔥</span><span>Огонь расползается каждый ход — на 4 соседние клетки. По стенам и выгоревшему не идёт.</span></div>
-      <div><span class="i">🧱</span><span>Ставь стенки из фигур (3 активные + 3 в очереди). Поворот — кнопкой. Сначала ты, потом огонь.</span></div>
-      <div><span class="i">🏠</span><span>Запри огонь, пока он не дошёл до домов. Пунктир — куда перекинется следующим ходом.</span></div>
-      <div><span class="i">⏱</span><span>Чем быстрее заперт огонь — тем больше очков. Иногда выгоднее отдать угол и спасти главное.</span></div>
+      <div><span class="i">🧱</span><span>Ставь стенки из фигур (3 активные + 3 в очереди). Поворот — кнопкой.</span></div>
+      <div><span class="i">🏠</span><span>Запри огонь до домов. Пунктир — куда перекинется следующим ходом.</span></div>
+      <div><span class="i">👆</span><span>Тяни палец по полю — фигура встаёт по центру. Отпусти — поставишь.</span></div>
     </div>
-    <button class="btn btn-go" id="go">Тушить</button>`);
-  $('go').onclick=()=>hide();
+    <button class="btn btn-go" id="btnStart">Тушить</button>`);
+  $('btnStart').onclick=()=>hide();
 }
+
 const ovl=$('ovl');
 function show(html){ovl.innerHTML=`<div class="ovl"><div class="card">${html}</div></div>`}
 function hide(){ovl.innerHTML=''}
 
-start();showIntro();
 })();
 </script>
 </body>
