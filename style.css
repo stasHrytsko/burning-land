@@ -91,11 +91,14 @@ body{background:var(--night);color:var(--sand);
 .tray-lbl{display:flex;justify-content:center;font-size:12px;letter-spacing:.06em;
   text-transform:uppercase;color:var(--sand-dim);margin-bottom:8px}
 .pieces{display:flex;gap:10px;align-items:stretch;min-height:96px}
-.piece{background:var(--night-2);border:2px solid var(--line);border-radius:14px;padding:10px;
+.piece{position:relative;overflow:hidden;touch-action:none;
+  background:var(--night-2);border:2px solid var(--line);border-radius:14px;padding:10px;
   cursor:pointer;transition:transform .1s,border-color .1s,opacity .2s;
   flex:1;display:flex;justify-content:center;align-items:center}
 .piece.sel{border-color:var(--amber);transform:translateY(-4px);background:#2a2114;
   box-shadow:0 4px 14px rgba(242,163,60,.25)}
+/* блок «поднят» и тащится на поле */
+.piece.lifting{opacity:.35;border-color:var(--amber)}
 .piece .mini{display:grid;gap:3px}
 .piece .mini i{width:18px;height:18px;border-radius:3px;background:var(--wall);display:block}
 .piece .mini i.e{background:transparent}

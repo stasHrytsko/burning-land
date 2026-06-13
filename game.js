@@ -119,7 +119,7 @@ function start(lvIdx) {
     houses.push([r, c]);
   }
 
-  S = { grid, houses, turn:1, tray:Array.from({length:6}, randShape), sel:0, over:false, ghost:null, aim:null };
+  S = { grid, houses, turn:1, tray:Array.from({length:6}, randShape), sel:0, over:false, ghost:null, dragging:false };
   buildBoard(); renderTray(); render(); hidePopup();
 }
 
@@ -133,12 +133,13 @@ function buildBoard() {
   }
 }
 
-// События доски — добавляются один раз.
-// Постановка в два тапа: 1-й тап показывает превью, 2-й тап в ту же клетку ставит.
-board.addEventListener('pointerdown', onBoardTap);
+// ── Перетаскивание блока из трея ──
+// Нажал на блок → сразу «поднял» и тащишь: превью едет за пальцем.
+// Отпустил над свободной клеткой = поставить, мимо = отмена. Никаких тапов/удержаний.
+let press = null; // {i, x, y, el}
 
-function cellFromEvent(e) {
-  const el = document.elementFromPoint(e.clientX, e.clientY);
+function cellFromPoint(x, y) {
+  const el = document.elementFromPoint(x, y);
   if (!el) return null;
   const c = el.closest?.('.c') || el;
   return (c && c.dataset && c.dataset.r != null) ? [+c.dataset.r, +c.dataset.c] : null;
@@ -147,26 +148,48 @@ function anchorFor(pr, pc) {
   const [oy, ox] = centerOffset(S.tray[S.sel]);
   return [pr - oy, pc - ox];
 }
+// Обновляет превью под текущей точкой пальца (или прячет, если палец не над доской)
+function ghostFromPoint(x, y) {
+  const pos = cellFromPoint(x, y);
+  if (pos) { const [ar, ac] = anchorFor(pos[0], pos[1]); S.ghost = [S.tray[S.sel], ar, ac]; }
+  else S.ghost = null;
+  render();
+}
 function placeAim() {
   const [sh, ar, ac] = S.ghost;
   cellsFor(sh, ar, ac).forEach(([y, x]) => S.grid[y][x] = 1);
   S.tray.splice(S.sel, 1); S.tray.push(randShape());
-  S.sel = 0; S.ghost = null; S.aim = null; spreadFire();
+  S.sel = 0; S.ghost = null; S.dragging = false; spreadFire();
 }
-function onBoardTap(e) {
+
+function trayDown(e, i, el) {
   if (!S || S.over) return;
-  const pos = cellFromEvent(e); if (!pos) return;
-  const [tr, tc] = pos;
-  // 2-й тап в ту же клетку → подтверждаем постановку (если место валидно)
-  if (S.aim && S.aim[0] === tr && S.aim[1] === tc) {
-    if (canPlace(S.ghost[0], S.ghost[1], S.ghost[2])) placeAim();
-    return; // невалидно — оставляем красное превью, ждём перемещения
-  }
-  // 1-й тап / новое место → показываем превью, не ставим
-  const [ar, ac] = anchorFor(tr, tc);
-  S.aim = [tr, tc];
-  S.ghost = [S.tray[S.sel], ar, ac];
-  render();
+  e.preventDefault();
+  S.sel = i; S.dragging = true; S.ghost = null;
+  renderTray(); render();
+  press = { i, x: e.clientX, y: e.clientY, el };
+  el.classList.add('lifting');              // блок «поднят» и едет за пальцем
+  if (navigator.vibrate) navigator.vibrate(15);
+  ghostFromPoint(e.clientX, e.clientY);
+  window.addEventListener('pointermove', trayMove);
+  window.addEventListener('pointerup', trayUp);
+  window.addEventListener('pointercancel', trayUp);
+}
+function trayMove(e) {
+  if (!press) return;
+  e.preventDefault();
+  press.x = e.clientX; press.y = e.clientY;
+  ghostFromPoint(e.clientX, e.clientY);
+}
+function trayUp() {
+  if (!press) return;
+  press.el.classList.remove('lifting');
+  window.removeEventListener('pointermove', trayMove);
+  window.removeEventListener('pointerup', trayUp);
+  window.removeEventListener('pointercancel', trayUp);
+  press = null;
+  if (S.ghost && canPlace(S.ghost[0], S.ghost[1], S.ghost[2])) placeAim();
+  else { S.ghost = null; S.dragging = false; render(); } // отпустил мимо/невалидно — отмена
 }
 
 const cellAt  = (r, c) => board.children[r * N + c];
@@ -272,9 +295,7 @@ function renderTray() {
       mini.appendChild(cell);
     }
     p.appendChild(mini);
-    p.addEventListener('pointerdown', e => {
-      e.stopPropagation(); S.sel = i; S.ghost = null; S.aim = null; renderTray(); render();
-    });
+    p.addEventListener('pointerdown', e => { e.stopPropagation(); trayDown(e, i, p); });
     box.appendChild(p);
   });
 }
@@ -282,8 +303,8 @@ function renderTray() {
 $('rotateBtn').onclick  = () => {
   if (!S || S.over) return;
   S.tray[S.sel] = rotate(S.tray[S.sel]);
-  // если уже целимся — перерисовываем превью повёрнутой фигуры на том же месте
-  if (S.aim) { const [ar, ac] = anchorFor(S.aim[0], S.aim[1]); S.ghost = [S.tray[S.sel], ar, ac]; }
+  // во время перетаскивания — перерисовываем превью повёрнутой фигуры под пальцем
+  if (S.dragging && press) { ghostFromPoint(press.x, press.y); return; }
   renderTray(); render();
 };
 $('restartBtn').onclick = () => { if (S) start(); };
