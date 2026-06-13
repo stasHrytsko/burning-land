@@ -15,17 +15,18 @@ $('p2back').onclick   = () => showPage(1);
 $('gameBack').onclick = () => showPage(2);
 
 // ── Конфиги уровней ──
-// seeds=очаги, houses=дома, minDist=мин.дистанция очаг→дом, central=огонь в центре поля
+// seeds=очаги, houses=дома, minDist=мин.дистанция очаг→дом
+// zone: 'corner' — огонь в углу (расползается в четверть, легко), 'edge' — широкий фронт у края
 const LEVELS = [
-  { seeds:1, houses:2, minDist:5, central:false }, // 1 легко
-  { seeds:1, houses:2, minDist:4, central:false }, // 2
-  { seeds:1, houses:3, minDist:4, central:false }, // 3
-  { seeds:2, houses:3, minDist:3, central:false }, // 4 средне
-  { seeds:2, houses:4, minDist:3, central:false }, // 5
-  { seeds:2, houses:4, minDist:2, central:false }, // 6
-  { seeds:3, houses:4, minDist:2, central:true  }, // 7 сложно
-  { seeds:3, houses:5, minDist:2, central:true  }, // 8
-  { seeds:3, houses:5, minDist:1, central:true  }, // 9
+  { seeds:1, houses:2, minDist:5, zone:'corner' }, // 1 легко
+  { seeds:1, houses:3, minDist:5, zone:'corner' }, // 2
+  { seeds:1, houses:3, minDist:4, zone:'corner' }, // 3
+  { seeds:1, houses:3, minDist:5, zone:'edge'   }, // 4 средне
+  { seeds:2, houses:4, minDist:5, zone:'edge'   }, // 5
+  { seeds:2, houses:4, minDist:4, zone:'edge'   }, // 6
+  { seeds:2, houses:4, minDist:5, zone:'edge'   }, // 7 сложно
+  { seeds:3, houses:5, minDist:5, zone:'edge'   }, // 8
+  { seeds:3, houses:5, minDist:4, zone:'edge'   }, // 9
 ];
 
 // ── Сетка выбора уровней ──
@@ -83,12 +84,20 @@ function start(lvIdx) {
   const grid = Array.from({ length: N }, () => Array(N).fill(0));
 
   // Расставляем очаги
+  // для 'edge' выбираем одну сторону и точку на ней — очаги кучкуются в один фронт
+  const side = rnd(4);
+  const anchor = 2 + rnd(N - 4);
   const seeds = []; let t = 0;
   while (seeds.length < lv.seeds && t++ < 200) {
     let r, c;
-    if (lv.central) {
-      r = 2 + rnd(N - 4); c = 2 + rnd(N - 4);
-    } else {
+    if (lv.zone === 'edge') {
+      const along = Math.max(1, Math.min(N - 2, anchor + rnd(3) - 1)); // ±1 от якоря вдоль края
+      const depth = rnd(2);                                            // 0–1 клетка от границы
+      if      (side === 0) { r = depth;       c = along; }
+      else if (side === 1) { r = N-1-depth;   c = along; }
+      else if (side === 2) { r = along;       c = depth; }
+      else                 { r = along;       c = N-1-depth; }
+    } else { // corner
       const e = rnd(4);
       if      (e === 0) { r = rnd(2);     c = rnd(3); }
       else if (e === 1) { r = N-1-rnd(2); c = N-1-rnd(3); }
@@ -96,7 +105,7 @@ function start(lvIdx) {
       else              { r = N-1-rnd(3); c = rnd(2); }
     }
     if (grid[r][c] !== 0) continue;
-    if (seeds.some(s => Math.abs(s[0]-r) + Math.abs(s[1]-c) < 3)) continue;
+    if (seeds.some(s => Math.abs(s[0]-r) + Math.abs(s[1]-c) < 1)) continue; // не на одной клетке
     seeds.push([r, c]); grid[r][c] = 2;
   }
 
@@ -166,15 +175,21 @@ function canPlace(shape, r, c) {
 
 // ── Логика огня ──
 function spreadFire() {
-  const add = [];
+  const fireCells = [];      // где огонь сейчас → станет выгоревшим
+  const addSet = new Set();  // куда фронт перекинется → станет огнём
   for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
     if (S.grid[r][c] !== 2) continue;
+    fireCells.push([r, c]);
     [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dy, dx]) => {
       const y = r+dy, x = c+dx;
-      if (y >= 0 && y < N && x >= 0 && x < N && S.grid[y][x] === 0) add.push([y, x]);
+      if (y >= 0 && y < N && x >= 0 && x < N && S.grid[y][x] === 0) addSet.add(y * N + x);
     });
   }
+  // старый огонь выгорает (чёрная клетка), новый фронт загорается
+  fireCells.forEach(([r, c]) => S.grid[r][c] = 3);
+  const add = [...addSet].map(k => [k / N | 0, k % N]);
   add.forEach(([y, x]) => S.grid[y][x] = 2);
+
   if (S.houses.some(h => S.grid[h[0]][h[1]] === 2)) {
     S.over = 'lose'; render(); setTimeout(() => popupLose(), 500); return;
   }
@@ -234,14 +249,13 @@ function render() {
 // ── Рендер трея ──
 function renderTray() {
   const box = $('pieces'); box.innerHTML = '';
-  S.tray.forEach((sh, i) => {
-    if (i === 3) { const sep = document.createElement('div'); sep.className = 'sep'; box.appendChild(sep); }
-    const active = i < 3;
+  // показываем только 3 активных блока, очередь скрыта
+  S.tray.slice(0, 3).forEach((sh, i) => {
     const p = document.createElement('div');
-    p.className = 'piece' + (active ? '' : ' next') + (i === S.sel ? ' sel' : '');
+    p.className = 'piece' + (i === S.sel ? ' sel' : '');
     const maxY = Math.max(...sh.map(c => c[0])), maxX = Math.max(...sh.map(c => c[1]));
     const mini = document.createElement('div'); mini.className = 'mini';
-    mini.style.gridTemplateColumns = `repeat(${maxX + 1},11px)`;
+    mini.style.gridTemplateColumns = `repeat(${maxX + 1},18px)`;
     const filled = new Set(sh.map(([y, x]) => y * 10 + x));
     for (let y = 0; y <= maxY; y++) for (let x = 0; x <= maxX; x++) {
       const cell = document.createElement('i');
@@ -249,7 +263,7 @@ function renderTray() {
       mini.appendChild(cell);
     }
     p.appendChild(mini);
-    if (active) p.addEventListener('pointerdown', e => {
+    p.addEventListener('pointerdown', e => {
       e.stopPropagation(); S.sel = i; S.ghost = null; renderTray(); render();
     });
     box.appendChild(p);
