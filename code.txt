@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Брандмауэр — прототип</title>
+<style>
+  :root{
+    --night:#15100C; --night-2:#211811;
+    --grass:#2C2A1E; --grass-2:#332F20;
+    --sand:#EDE2C8; --sand-dim:#9C8E72;
+    --wall:#8A6A48; --wall-top:#A6855C;
+    --fire:#E5532B; --fire-2:#F2933C; --ember:#7A2A14;
+    --house:#3FB6A0; --house-lost:#5a4a40;
+    --line:#3D3122; --amber:#F2A33C;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{background:var(--night);color:var(--sand);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    display:flex;flex-direction:column;align-items:center;min-height:100dvh;overflow:hidden;user-select:none;-webkit-user-select:none}
+  #app{width:100%;max-width:430px;min-height:100dvh;display:flex;flex-direction:column;padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
+
+  .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .ttl{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--sand-dim)}
+  .stats{display:flex;gap:14px;font-size:13px}
+  .stats .v{font-family:ui-monospace,Menlo,monospace;font-weight:800;font-variant-numeric:tabular-nums}
+  .stats .house .v{color:var(--house)} .stats .turn .v{color:var(--amber)}
+  .warn{font-size:12px;color:var(--fire-2);text-align:center;height:16px;margin-bottom:6px;transition:opacity .2s}
+
+  #board{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;background:var(--night-2);
+    border:1px solid var(--line);border-radius:12px;padding:7px;margin-bottom:12px;touch-action:none}
+  .c{aspect-ratio:1;border-radius:5px;background:var(--grass);position:relative;
+    display:flex;align-items:center;justify-content:center;font-size:clamp(13px,4.4vw,20px);
+    transition:background .12s, transform .06s}
+  .c:nth-child(even){background:var(--grass-2)}
+  .c.ghost{background:#4a4326;box-shadow:inset 0 0 0 2px var(--amber)}
+  .c.ghost-bad{background:#46291f;box-shadow:inset 0 0 0 2px var(--fire)}
+  .c.wall{background:var(--wall);box-shadow:inset 0 3px 0 rgba(255,235,200,.18),inset 0 -3px 0 rgba(0,0,0,.3);animation:drop .15s ease}
+  @keyframes drop{from{transform:scale(.8)}to{transform:scale(1)}}
+  .c.fire{background:radial-gradient(circle at 50% 65%,var(--fire-2),var(--fire) 60%,var(--ember));animation:flick .5s ease-in-out infinite alternate}
+  @keyframes flick{from{filter:brightness(1)}to{filter:brightness(1.18)}}
+  .c.burnt{background:#1c1611}
+  .c.willburn::after{content:'';position:absolute;inset:34%;border-radius:50%;border:2px dashed var(--fire-2);opacity:.8;animation:pulse 1s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(.85);opacity:.5}50%{transform:scale(1.15);opacity:.95}}
+  .c .ico{position:relative;z-index:2;pointer-events:none}
+  .c.house-lost{background:var(--house-lost)}
+
+  /* tray */
+  .tray{margin-bottom:10px}
+  .tray-lbl{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sand-dim);margin-bottom:6px}
+  .pieces{display:flex;gap:8px;align-items:flex-end;min-height:72px}
+  .piece{background:var(--night-2);border:1px solid var(--line);border-radius:10px;padding:7px;cursor:pointer;
+    transition:transform .1s, border-color .1s, opacity .2s;flex:1;display:flex;justify-content:center;align-items:center}
+  .piece.sel{border-color:var(--amber);transform:translateY(-3px);background:#2a2114}
+  .piece.next{opacity:.4;flex:.7}
+  .piece .mini{display:grid;gap:2px}
+  .piece .mini i{width:11px;height:11px;border-radius:2px;background:var(--wall);display:block}
+  .piece .mini i.e{background:transparent}
+  .sep{width:1px;background:var(--line);align-self:stretch;margin:4px 2px}
+
+  .btn{width:100%;border:none;border-radius:13px;padding:13px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;transition:transform .08s}
+  .btn:active{transform:scale(.97)}
+  .btn-ghost{background:transparent;color:var(--sand-dim);border:1px solid var(--line)}
+  .btn-go{background:var(--amber);color:#2e1d00}
+  .row{display:flex;gap:8px}
+
+  .ovl{position:fixed;inset:0;background:rgba(12,8,5,.88);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:22px;z-index:50;animation:fade .25s}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .card{width:100%;max-width:340px;background:var(--night-2);border:1px solid var(--line);border-radius:18px;padding:24px 20px;text-align:center}
+  .card h2{font-size:21px;margin-bottom:8px}
+  .card p{font-size:14px;line-height:1.5;color:var(--sand-dim);margin-bottom:8px}
+  .card p b{color:var(--sand)}
+  .card .big{font-size:34px;font-weight:800;font-family:ui-monospace,Menlo,monospace;margin:6px 0 12px}
+  .ok{color:var(--house)} .bad{color:var(--fire)}
+  .rules{text-align:left;font-size:13.5px;line-height:1.55;color:var(--sand-dim);margin:14px 0 18px}
+  .rules div{margin-bottom:9px;display:flex;gap:9px}
+  .rules .i{flex:0 0 22px;text-align:center}
+  .title{font-size:25px;font-weight:800;letter-spacing:.04em}
+  .subtitle{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top">
+    <div class="ttl">Брандмауэр</div>
+    <div class="stats">
+      <div class="house">🏠 <span class="v" id="houses">0</span></div>
+      <div class="turn">Ход <span class="v" id="turn">1</span></div>
+    </div>
+  </div>
+  <div class="warn" id="warn"></div>
+
+  <div id="board"></div>
+
+  <div class="tray">
+    <div class="tray-lbl"><span>Стенки — поставь одну</span><span id="pass"></span></div>
+    <div class="pieces" id="pieces"></div>
+  </div>
+
+  <div class="row">
+    <button class="btn btn-ghost" id="rotateBtn">⟳ Повернуть</button>
+    <button class="btn btn-ghost" id="restartBtn">Заново</button>
+  </div>
+</div>
+
+<div id="ovl"></div>
+
+<script>
+(()=>{
+const N=8;
+const $=id=>document.getElementById(id);
+const board=$('board');
+const rnd=n=>Math.random()*n|0;
+
+// piece shapes (relative cells)
+const SHAPES=[
+  [[0,0],[0,1]],                 // domino
+  [[0,0],[0,1],[0,2]],           // I3
+  [[0,0],[0,1],[1,0]],           // corner L
+  [[0,0],[0,1],[1,0],[1,1]],     // square
+  [[0,0],[0,1],[0,2],[1,0]],     // J
+  [[0,0],[0,1],[1,1],[1,2]],     // S
+  [[0,0],[0,1],[0,2],[1,1]],     // T
+  [[0,0]],                        // single (rare)
+];
+function randShape(){
+  const r=Math.random();
+  const pool=r<.12?[[[0,0]]]:SHAPES.slice(0,7);
+  return pool[rnd(pool.length)].map(p=>[...p]);
+}
+function rotate(cells){ // 90deg
+  const r=cells.map(([y,x])=>[x,-y]);
+  const miny=Math.min(...r.map(p=>p[0])),minx=Math.min(...r.map(p=>p[1]));
+  return r.map(([y,x])=>[y-miny,x-minx]);
+}
+
+let S=null;
+function start(){
+  // grid: 0 grass,1 wall,2 fire,3 burnt
+  const grid=Array.from({length:N},()=>Array(N).fill(0));
+  // 2 fire seeds near edges/corners
+  const seeds=[[0,rnd(3)],[N-1,N-1-rnd(3)]];
+  seeds.forEach(([r,c])=>grid[r][c]=2);
+  // houses: 3-4 placed away from seeds
+  const houses=[];
+  let tries=0;
+  while(houses.length<4&&tries++<200){
+    const r=2+rnd(N-4),c=1+rnd(N-2);
+    if(grid[r][c]!==0)continue;
+    if(houses.some(h=>Math.abs(h[0]-r)+Math.abs(h[1]-c)<2))continue;
+    if(seeds.some(s=>Math.abs(s[0]-r)+Math.abs(s[1]-c)<3))continue;
+    houses.push([r,c]);
+  }
+  S={grid,houses,turn:1,tray:[randShape(),randShape(),randShape(),randShape(),randShape(),randShape()],
+     sel:0,over:false,ghost:null};
+  buildBoard();renderTray();render();
+}
+
+function buildBoard(){
+  board.innerHTML='';
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    const d=document.createElement('div');
+    d.className='c';d.dataset.r=r;d.dataset.c=c;
+    d.addEventListener('pointerenter',()=>hover(r,c));
+    d.addEventListener('pointerdown',()=>{hover(r,c);placeSel(r,c)});
+    board.appendChild(d);
+  }
+}
+const cellAt=(r,c)=>board.children[r*N+c];
+const isHouse=(r,c)=>S.houses.some(h=>h[0]===r&&h[1]===c);
+
+function cellsFor(shape,r,c){return shape.map(([dy,dx])=>[r+dy,c+dx])}
+function canPlace(shape,r,c){
+  return cellsFor(shape,r,c).every(([y,x])=>
+    y>=0&&y<N&&x>=0&&x<N&&S.grid[y][x]===0&&!isHouse(y,x));
+}
+
+function hover(r,c){
+  if(S.over)return;
+  S.ghost=[S.tray[S.sel],r,c];
+  render();
+}
+function placeSel(r,c){
+  if(S.over)return;
+  const shape=S.tray[S.sel];
+  if(!canPlace(shape,r,c))return;
+  cellsFor(shape,r,c).forEach(([y,x])=>S.grid[y][x]=1);
+  // consume piece, shift queue, draw new
+  S.tray.splice(S.sel,1);
+  S.tray.push(randShape());
+  S.sel=0;S.ghost=null;
+  spreadFire();
+}
+
+function spreadFire(){
+  const add=[];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    if(S.grid[r][c]!==2)continue;
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dy,dx])=>{
+      const y=r+dy,x=c+dx;
+      if(y>=0&&y<N&&x>=0&&x<N&&S.grid[y][x]===0)add.push([y,x]);
+    });
+  }
+  add.forEach(([y,x])=>S.grid[y][x]=2);
+  // house hit?
+  const lost=S.houses.find(h=>S.grid[h[0]][h[1]]===2);
+  if(lost){S.over='lose';render();setTimeout(()=>finish(false),500);return}
+  // fire fully contained?
+  if(add.length===0&&!anyFireCanGrow()){S.over='win';render();setTimeout(()=>finish(true),500);return}
+  S.turn++;
+  render();renderTray();
+}
+function anyFireCanGrow(){
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    if(S.grid[r][c]!==2)continue;
+    for(const[dy,dx]of[[1,0],[-1,0],[0,1],[0,-1]]){
+      const y=r+dy,x=c+dx;
+      if(y>=0&&y<N&&x>=0&&x<N&&S.grid[y][x]===0)return true;
+    }
+  }
+  return false;
+}
+// cells that will catch fire on the NEXT fire step (preview)
+function nextBurn(){
+  const set=new Set();
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    if(S.grid[r][c]!==2)continue;
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dy,dx])=>{
+      const y=r+dy,x=c+dx;
+      if(y>=0&&y<N&&x>=0&&x<N&&S.grid[y][x]===0)set.add(y*N+x);
+    });
+  }
+  return set;
+}
+
+function render(){
+  const burn=nextBurn();
+  const ghostCells=new Set();
+  let ghostOk=true;
+  if(S.ghost){
+    const[sh,r,c]=S.ghost;
+    ghostOk=canPlace(sh,r,c);
+    cellsFor(sh,r,c).forEach(([y,x])=>{if(y>=0&&y<N&&x>=0&&x<N)ghostCells.add(y*N+x)});
+  }
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    const d=cellAt(r,c),v=S.grid[r][c],k=r*N+c;
+    let cls='c';
+    if(v===1)cls+=' wall';
+    else if(v===2)cls+=' fire';
+    else if(v===3)cls+=' burnt';
+    if(isHouse(r,c)&&v===2)cls+=' house-lost';
+    if(!S.over&&v===0&&burn.has(k)&&!ghostCells.has(k))cls+=' willburn';
+    if(ghostCells.has(k))cls+=ghostOk?' ghost':' ghost-bad';
+    d.className=cls;
+    // icon
+    let ico='';
+    if(isHouse(r,c))ico=S.grid[r][c]===2?'🔥':'🏠';
+    else if(v===2)ico='🔥';
+    d.innerHTML=ico?`<span class="ico">${ico}</span>`:'';
+  }
+  $('houses').textContent=S.houses.filter(h=>S.grid[h[0]][h[1]]!==2).length+'/'+S.houses.length;
+  $('turn').textContent=S.turn;
+  const warn=$('warn');
+  const threat=S.houses.some(h=>{
+    return [[1,0],[-1,0],[0,1],[0,-1]].some(([dy,dx])=>{
+      const y=h[0]+dy,x=h[1]+dx;
+      return y>=0&&y<N&&x>=0&&x<N&&S.grid[y][x]===2;
+    });
+  });
+  warn.textContent=threat?'⚠ Огонь у дома! Защити его этим ходом':'';
+}
+
+function renderTray(){
+  const box=$('pieces');box.innerHTML='';
+  S.tray.forEach((sh,i)=>{
+    if(i===3){const sep=document.createElement('div');sep.className='sep';box.appendChild(sep)}
+    const active=i<3;
+    const p=document.createElement('div');
+    p.className='piece'+(active?'':' next')+(i===S.sel?' sel':'');
+    const maxY=Math.max(...sh.map(c=>c[0])),maxX=Math.max(...sh.map(c=>c[1]));
+    const mini=document.createElement('div');mini.className='mini';
+    mini.style.gridTemplateColumns=`repeat(${maxX+1},11px)`;
+    const filled=new Set(sh.map(([y,x])=>y*10+x));
+    for(let y=0;y<=maxY;y++)for(let x=0;x<=maxX;x++){
+      const cell=document.createElement('i');
+      if(!filled.has(y*10+x))cell.className='e';
+      mini.appendChild(cell);
+    }
+    p.appendChild(mini);
+    if(active)p.addEventListener('pointerdown',e=>{e.stopPropagation();S.sel=i;S.ghost=null;renderTray();render()});
+    box.appendChild(p);
+  });
+  $('pass').textContent='в очереди: 3';
+}
+
+$('rotateBtn').onclick=()=>{if(S.over)return;S.tray[S.sel]=rotate(S.tray[S.sel]);S.ghost=null;renderTray();render()};
+$('restartBtn').onclick=()=>start();
+board.addEventListener('pointerleave',()=>{S.ghost=null;render()});
+
+function finish(win){
+  const saved=S.houses.filter(h=>S.grid[h[0]][h[1]]!==2).length;
+  if(win){
+    const score=saved*100+Math.max(0,(40-S.turn))*10;
+    show(`<h2 class="ok">🛡 Огонь заперт!</h2>
+      <div class="big ok">${score}</div>
+      <p>Спасено домов: <b>${saved}/${S.houses.length}</b>. Заперто за <b>${S.turn}</b> ходов — чем быстрее, тем больше очков.</p>
+      <button class="btn btn-go" id="go">Ещё пожар</button>`);
+  }else{
+    show(`<h2 class="bad">🔥 Дом сгорел</h2>
+      <div class="big bad">${saved}/${S.houses.length}</div>
+      <p>Огонь прорвался к дому. Видел, какие клетки загорятся, — где надо было ставить стенку?</p>
+      <button class="btn btn-go" id="go">Ещё раз</button>`);
+  }
+  $('go').onclick=()=>{hide();start()};
+}
+function showIntro(){
+  show(`<div class="subtitle">прототип</div><div class="title">БРАНДМАУЭР</div>
+    <div class="rules">
+      <div><span class="i">🔥</span><span>Огонь расползается каждый ход — на 4 соседние клетки. По стенам и выгоревшему не идёт.</span></div>
+      <div><span class="i">🧱</span><span>Ставь стенки из фигур (3 активные + 3 в очереди). Поворот — кнопкой. Сначала ты, потом огонь.</span></div>
+      <div><span class="i">🏠</span><span>Запри огонь, пока он не дошёл до домов. Пунктир — куда перекинется следующим ходом.</span></div>
+      <div><span class="i">⏱</span><span>Чем быстрее заперт огонь — тем больше очков. Иногда выгоднее отдать угол и спасти главное.</span></div>
+    </div>
+    <button class="btn btn-go" id="go">Тушить</button>`);
+  $('go').onclick=()=>hide();
+}
+const ovl=$('ovl');
+function show(html){ovl.innerHTML=`<div class="ovl"><div class="card">${html}</div></div>`}
+function hide(){ovl.innerHTML=''}
+
+start();showIntro();
+})();
+</script>
+</body>
+</html>
