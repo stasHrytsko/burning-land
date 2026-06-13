@@ -119,7 +119,7 @@ function start(lvIdx) {
     houses.push([r, c]);
   }
 
-  S = { grid, houses, turn:1, tray:Array.from({length:6}, randShape), sel:0, over:false, ghost:null };
+  S = { grid, houses, turn:1, tray:Array.from({length:6}, randShape), sel:0, over:false, ghost:null, aim:null };
   buildBoard(); renderTray(); render(); hidePopup();
 }
 
@@ -133,11 +133,9 @@ function buildBoard() {
   }
 }
 
-// События доски — добавляются один раз
-board.addEventListener('pointermove',  onBoardPtr, { passive: true });
-board.addEventListener('pointerdown',  onBoardPtr);
-board.addEventListener('pointerup',    onBoardUp);
-board.addEventListener('pointerleave', () => { if (S) { S.ghost = null; render(); } });
+// События доски — добавляются один раз.
+// Постановка в два тапа: 1-й тап показывает превью, 2-й тап в ту же клетку ставит.
+board.addEventListener('pointerdown', onBoardTap);
 
 function cellFromEvent(e) {
   const el = document.elementFromPoint(e.clientX, e.clientY);
@@ -149,20 +147,26 @@ function anchorFor(pr, pc) {
   const [oy, ox] = centerOffset(S.tray[S.sel]);
   return [pr - oy, pc - ox];
 }
-function onBoardPtr(e) {
-  if (!S || S.over) return;
-  const pos = cellFromEvent(e); if (!pos) return;
-  const [ar, ac] = anchorFor(pos[0], pos[1]);
-  S.ghost = [S.tray[S.sel], ar, ac]; render();
-}
-function onBoardUp(e) {
-  if (!S || S.over) return;
-  const pos = cellFromEvent(e); if (!pos) return;
-  const [ar, ac] = anchorFor(pos[0], pos[1]);
-  if (!canPlace(S.tray[S.sel], ar, ac)) return;
-  cellsFor(S.tray[S.sel], ar, ac).forEach(([y, x]) => S.grid[y][x] = 1);
+function placeAim() {
+  const [sh, ar, ac] = S.ghost;
+  cellsFor(sh, ar, ac).forEach(([y, x]) => S.grid[y][x] = 1);
   S.tray.splice(S.sel, 1); S.tray.push(randShape());
-  S.sel = 0; S.ghost = null; spreadFire();
+  S.sel = 0; S.ghost = null; S.aim = null; spreadFire();
+}
+function onBoardTap(e) {
+  if (!S || S.over) return;
+  const pos = cellFromEvent(e); if (!pos) return;
+  const [tr, tc] = pos;
+  // 2-й тап в ту же клетку → подтверждаем постановку (если место валидно)
+  if (S.aim && S.aim[0] === tr && S.aim[1] === tc) {
+    if (canPlace(S.ghost[0], S.ghost[1], S.ghost[2])) placeAim();
+    return; // невалидно — оставляем красное превью, ждём перемещения
+  }
+  // 1-й тап / новое место → показываем превью, не ставим
+  const [ar, ac] = anchorFor(tr, tc);
+  S.aim = [tr, tc];
+  S.ghost = [S.tray[S.sel], ar, ac];
+  render();
 }
 
 const cellAt  = (r, c) => board.children[r * N + c];
@@ -269,13 +273,19 @@ function renderTray() {
     }
     p.appendChild(mini);
     p.addEventListener('pointerdown', e => {
-      e.stopPropagation(); S.sel = i; S.ghost = null; renderTray(); render();
+      e.stopPropagation(); S.sel = i; S.ghost = null; S.aim = null; renderTray(); render();
     });
     box.appendChild(p);
   });
 }
 
-$('rotateBtn').onclick  = () => { if (!S || S.over) return; S.tray[S.sel] = rotate(S.tray[S.sel]); S.ghost = null; renderTray(); render(); };
+$('rotateBtn').onclick  = () => {
+  if (!S || S.over) return;
+  S.tray[S.sel] = rotate(S.tray[S.sel]);
+  // если уже целимся — перерисовываем превью повёрнутой фигуры на том же месте
+  if (S.aim) { const [ar, ac] = anchorFor(S.aim[0], S.aim[1]); S.ghost = [S.tray[S.sel], ar, ac]; }
+  renderTray(); render();
+};
 $('restartBtn').onclick = () => { if (S) start(); };
 
 // ── Попапы ──
