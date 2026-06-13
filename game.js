@@ -174,7 +174,13 @@ function canPlace(shape, r, c) {
 }
 
 // ── Логика огня ──
+function win() {
+  S.over = 'win'; render(); setTimeout(() => popupWin(), 500);
+}
 function spreadFire() {
+  // Огонь уже заперт — победа сразу, не дожидаясь лишнего хода. Фронт остаётся видимым.
+  if (nextBurn().size === 0) { win(); return; }
+
   const fireCells = [];      // где огонь сейчас → станет выгоревшим
   const addSet = new Set();  // куда фронт перекинется → станет огнём
   for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
@@ -193,9 +199,8 @@ function spreadFire() {
   if (S.houses.some(h => S.grid[h[0]][h[1]] === 2)) {
     S.over = 'lose'; render(); setTimeout(() => popupLose(), 500); return;
   }
-  if (add.length === 0) {
-    S.over = 'win'; render(); setTimeout(() => popupWin(), 500); return;
-  }
+  // Новый фронт оказался заперт (некуда расползаться) — победа сразу, без лишнего хода.
+  if (nextBurn().size === 0) { win(); return; }
   S.turn++; render(); renderTray();
 }
 
