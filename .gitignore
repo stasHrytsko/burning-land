@@ -1,0 +1,19 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# Capacitor android/ ships its own .gitignore (build/, .gradle/, local.properties, *.apk/*.aab, etc.) — не дублируем его тут.
+*.keystore
+*.jks
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
