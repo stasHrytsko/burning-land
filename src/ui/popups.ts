@@ -24,20 +24,21 @@ export interface PopupHandlers {
 
 export function popupWin(state: GameState, curLevel: number, handlers: PopupHandlers) {
   const { saved, score } = saveScore(state);
-  const hasNext = curLevel < LEVELS.length - 1;
+  // после последнего курируемого уровня игра не заканчивается — открывается endless-режим
+  // (следующие «уровни» переиспользуют самый сложный конфиг, см. engine/game.ts#resolveLevel)
+  const isCurated = curLevel < LEVELS.length - 1;
+  const nextLabel = isCurated ? `Уровень ${curLevel + 2} →` : 'Ещё →';
   showPopup(`
     <div class="emoji">🛡</div>
     <h2 class="ok">Поздравляю, прошёл!</h2>
     <p>Домов спасено: <b>${saved}/${state.houses.length}</b> · Ходов: <b>${state.turn}</b></p>
     <div class="score">${score}</div>
     <div class="btns">
-      ${hasNext ? `<button class="btn btn-go" id="btnNext">Уровень ${curLevel + 2} →</button>` : ''}
+      <button class="btn btn-go" id="btnNext">${nextLabel}</button>
       <button class="btn btn-dim" id="btnAgain">Ещё раз</button>
       <button class="btn btn-dim" id="btnLvls">К уровням</button>
     </div>`);
-  if (hasNext) {
-    document.getElementById('btnNext')?.addEventListener('click', () => handlers.onNext?.());
-  }
+  document.getElementById('btnNext')?.addEventListener('click', () => handlers.onNext?.());
   document.getElementById('btnAgain')?.addEventListener('click', handlers.onAgain);
   document.getElementById('btnLvls')?.addEventListener('click', handlers.onLevels);
 }

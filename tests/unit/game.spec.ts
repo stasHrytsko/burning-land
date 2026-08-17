@@ -17,8 +17,18 @@ describe('createGame', () => {
     expect(state.tray).toHaveLength(TRAY_SIZE);
   });
 
-  it('throws for an out-of-range level index', () => {
-    expect(() => createGame(LEVELS.length, seededRng(1))).toThrow();
+  it('clamps out-of-range indices to the hardest curated level (endless mode)', () => {
+    const hardest = createGame(LEVELS.length - 1, seededRng(1));
+    const beyond = createGame(LEVELS.length, seededRng(1));
+    const wayBeyond = createGame(LEVELS.length + 50, seededRng(1));
+    expect(beyond).toEqual(hardest);
+    expect(wayBeyond).toEqual(hardest);
+  });
+
+  it('clamps negative indices to the first level', () => {
+    const first = createGame(0, seededRng(1));
+    const negative = createGame(-5, seededRng(1));
+    expect(negative).toEqual(first);
   });
 });
 

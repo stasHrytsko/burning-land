@@ -12,4 +12,5 @@ export const LEVELS: Level[] = [
   { seeds: 2, houses: 4, minDist: 5, zone: 'edge' },   // 7 сложно
   { seeds: 3, houses: 5, minDist: 5, zone: 'edge' },   // 8
   { seeds: 3, houses: 5, minDist: 4, zone: 'edge' },   // 9
+  { seeds: 3, houses: 6, minDist: 4, zone: 'edge' },   // 10 самый сложный курируемый уровень
 ];

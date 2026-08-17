@@ -39,7 +39,7 @@ body{background:var(--night);color:var(--sand);
   color:var(--sand-dim);cursor:pointer;margin-bottom:24px;padding:4px 0}
 .p2-title{font-size:22px;font-weight:800;letter-spacing:.04em;margin-bottom:6px}
 .p2-sub{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:28px}
-.lvl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:320px}
+.lvl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;max-width:320px}
 .lvl-btn{
   aspect-ratio:1;border-radius:16px;border:1px solid var(--line);background:var(--night-2);
   cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;

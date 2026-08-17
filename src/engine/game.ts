@@ -3,13 +3,23 @@ import { spreadFire } from './fire';
 import { canPlace, cellsFor } from './placement';
 import { LEVELS } from './levels';
 import { randShape } from './shapes';
-import type { GameState, Rng, Shape } from './types';
+import type { GameState, Level, Rng, Shape } from './types';
 
 export const TRAY_SIZE = 6;
 
+/**
+ * Уровни за пределами курируемого списка (endless-режим, кнопка «Ещё») переиспользуют
+ * конфиг самого сложного уровня — индекс клампится, а не выбрасывает ошибку.
+ */
+export function resolveLevel(levelIdx: number): Level {
+  const clamped = Math.max(0, Math.min(levelIdx, LEVELS.length - 1));
+  const level = LEVELS[clamped];
+  if (!level) throw new Error('LEVELS is empty');
+  return level;
+}
+
 export function createGame(levelIdx: number, rng: Rng = Math.random): GameState {
-  const level = LEVELS[levelIdx];
-  if (!level) throw new Error(`Unknown level index: ${levelIdx}`);
+  const level = resolveLevel(levelIdx);
   const { grid, houses } = generateBoard(level, rng);
   return {
     grid,
