@@ -31,6 +31,7 @@ body{background:var(--night);color:var(--sand);
   color:var(--sand-dim);margin-bottom:28px}
 .rules div{margin-bottom:11px;display:flex;gap:10px}
 .rules .i{flex:0 0 24px;text-align:center;font-size:18px}
+@keyframes flick{from{filter:brightness(1)}to{filter:brightness(1.18)}}
 
 /* ── Page 2: Level Select ── */
 #page2{justify-content:center;padding:28px 24px}
@@ -64,44 +65,12 @@ body{background:var(--night);color:var(--sand);
 .stats .house .v{color:var(--house)}.stats .turn .v{color:var(--amber)}
 .warn{font-size:13px;color:var(--fire-2);text-align:center;height:18px;margin-bottom:6px;font-weight:600}
 
-/* ── Board ── */
-#board{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;background:var(--night-2);
-  border:1px solid var(--line);border-radius:12px;padding:8px;margin-bottom:14px;touch-action:none}
-.c{aspect-ratio:1;border-radius:6px;background:var(--grass);position:relative;
-  display:flex;align-items:center;justify-content:center;font-size:clamp(16px,5.4vw,26px);
-  transition:background .12s,transform .06s}
-.c:nth-child(even){background:var(--grass-2)}
-.c.ghost{background:#4a4326;box-shadow:inset 0 0 0 2px var(--amber)}
-.c.ghost-bad{background:#46291f;box-shadow:inset 0 0 0 2px var(--fire)}
-.c.wall{background:var(--wall);box-shadow:inset 0 3px 0 rgba(255,235,200,.18),inset 0 -3px 0 rgba(0,0,0,.3);animation:drop .15s ease}
-@keyframes drop{from{transform:scale(.8)}to{transform:scale(1)}}
-.c.fire{background:radial-gradient(circle at 50% 65%,var(--fire-2),var(--fire) 60%,var(--ember));animation:flick .5s ease-in-out infinite alternate}
-@keyframes flick{from{filter:brightness(1)}to{filter:brightness(1.18)}}
-/* выгоревшая клетка — где огонь уже прошёл */
-.c.burnt{background:#0b0907;box-shadow:inset 0 0 0 1px #1a140e}
-/* куда огонь перекинется в следующий ход — маленькая приглушённая точка */
-.c.willburn::after{content:'';position:absolute;width:16%;height:16%;border-radius:50%;
-  background:var(--fire);box-shadow:0 0 3px rgba(229,83,43,.45);animation:pulse 1.3s ease-in-out infinite}
-@keyframes pulse{0%,100%{transform:scale(.65);opacity:.28}50%{transform:scale(1);opacity:.6}}
-.c .ico{position:relative;z-index:2;pointer-events:none}
-.c.house-lost{background:var(--house-lost)}
-
-/* ── Tray ── */
-.tray{margin-bottom:14px}
+/* ── Board + tray: рендерятся внутри Phaser-канваса, тут только его контейнер ── */
 .tray-lbl{display:flex;justify-content:center;font-size:12px;letter-spacing:.06em;
   text-transform:uppercase;color:var(--sand-dim);margin-bottom:8px}
-.pieces{display:flex;gap:10px;align-items:stretch;min-height:96px}
-.piece{position:relative;overflow:hidden;touch-action:none;
-  background:var(--night-2);border:2px solid var(--line);border-radius:14px;padding:10px;
-  cursor:pointer;transition:transform .1s,border-color .1s,opacity .2s;
-  flex:1;display:flex;justify-content:center;align-items:center}
-.piece.sel{border-color:var(--amber);transform:translateY(-4px);background:#2a2114;
-  box-shadow:0 4px 14px rgba(242,163,60,.25)}
-/* блок «поднят» и тащится на поле */
-.piece.lifting{opacity:.35;border-color:var(--amber)}
-.piece .mini{display:grid;gap:3px}
-.piece .mini i{width:18px;height:18px;border-radius:3px;background:var(--wall);display:block}
-.piece .mini i.e{background:transparent}
+#phaser-root{width:100%;max-width:400px;aspect-ratio:400/548;margin:0 auto 14px;
+  border-radius:12px;overflow:hidden;touch-action:none}
+#phaser-root canvas{display:block;width:100%!important;height:100%!important}
 
 /* ── Buttons ── */
 .row{display:flex;gap:10px}

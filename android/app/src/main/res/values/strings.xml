@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Брандмауэр</string>
+    <string name="title_activity_main">Брандмауэр</string>
+    <string name="package_name">com.brandmauer.game</string>
+    <string name="custom_url_scheme">com.brandmauer.game</string>
+</resources>
