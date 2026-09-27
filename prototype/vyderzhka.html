@@ -69,6 +69,26 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc-b);outline-
 .foe-line b{font-family:var(--font-d);color:var(--ink);font-size:13px}
 .foe-line .lvl{font-family:var(--font-d);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--t2);border-radius:3px;padding:0 4px;margin-inline:4px 2px}
 .adapt{display:block;margin-top:4px;color:var(--ink);border-left:2px solid var(--acc);padding-left:7px}
+.habit{display:flex;align-items:flex-start;gap:6px;margin-top:5px;color:var(--t3)}
+.habit .gl{width:13px;height:13px;flex:none;margin-top:2px}
+.habit.on{color:var(--ink);font-weight:500}
+.habit.on .gl{color:var(--acc-b)}
+.foe-card .hk{color:var(--ink);font-weight:500}
+
+.moves-wrap{position:relative}
+.pv{position:absolute;bottom:calc(100% + 8px);width:min(250px,100%);z-index:5;background:var(--ink);color:var(--paper);border-radius:6px;padding:9px 10px 8px;box-shadow:0 10px 26px rgba(33,33,33,.3);pointer-events:none}
+.pv::after{content:"";position:absolute;top:100%;left:var(--ax,50%);margin-left:-6px;border:6px solid transparent;border-top-color:var(--ink)}
+.pv h4{margin:0 0 6px;font-family:var(--font-d);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--acc-a)}
+.pr{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:7px;align-items:center;font-size:12.5px;padding:3px 0;border-top:1px solid rgba(246,243,238,.12)}
+.pr .gl{width:15px;height:15px}
+.pr em{font-style:normal;font-size:10px;background:var(--acc-b);color:#fff;border-radius:3px;padding:0 4px;margin-left:4px}
+.pr b{font-family:var(--font-d);font-size:13.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pr.w b{color:var(--acc-a)}
+.pr.l b{color:#C7C2BB}
+.pr.d b{color:#9A958E;font-weight:500}
+.pr small{grid-column:2/-1;color:#C7C2BB;font-size:10.5px;margin-top:-2px}
+.pv .pvn{font-size:10.5px;color:#9A958E;margin-top:4px}
+.mv{touch-action:manipulation;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 
 .hist{padding:9px 12px 8px;display:flex;flex-direction:column;gap:6px}
 .hist-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding-right:18px}
@@ -360,7 +380,10 @@ table.log{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeri
     </div>
   </section>
 
-  <section class="moves" id="moves" aria-label="Твои приёмы"></section>
+  <div class="moves-wrap">
+    <div class="pv" id="pv" hidden role="tooltip"></div>
+    <section class="moves" id="moves" aria-label="Твои приёмы"></section>
+  </div>
 
   <section class="hint pan" id="hint" aria-live="polite"><svg class="gl" aria-hidden="true"><use href="#g-bulb"/></svg><p id="hintText"></p></section>
 </div>
@@ -389,14 +412,15 @@ table.log{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeri
     <div id="balBody"></div>
     <div class="btns">
       <button class="btn" type="button" id="balApply">Новый бой с этими правилами</button>
-      <button class="btn alt" type="button" id="balReset">Вернуть 1.0</button>
+      <button class="btn alt" type="button" id="balReset">Вернуть 1.1</button>
     </div>
   </div>
 </div>
 
 <script>
 (() => {
-const KEY = 'vyderzhka-proto-v1';
+const KEY = 'vyderzhka-proto-v2';
+const OLD_KEY = 'vyderzhka-proto-v1';
 const NS = 'http://www.w3.org/2000/svg';
 const MOVES = ['S','P','F'];
 const NAME = {S:'Удар', P:'Парирование', F:'Финт'};
@@ -404,8 +428,8 @@ const LOW = {S:'удар', P:'парирование', F:'финт'};
 const BEATS = {S:'F', P:'S', F:'P'};
 const COUNTER = {S:'P', P:'F', F:'S'};
 const VERB = {S:'Удар бьёт финт', P:'Парирование ловит удар', F:'Финт обманывает парирование'};
-const RULES_V1 = {rounds:10, hp:40, start:2, reset:1, growth:1, max:5, bonus:1};
-const VIEW_V1 = {showDamage:true, fullHistory:true, tug:true};
+const RULES_V1 = {rounds:10, hp:45, start:2, reset:1, growth:1, max:5, bonus:1, parryKeep:2};
+const VIEW_V1 = {showDamage:true, fullHistory:true, tug:true, preview:true};
 const RULE_DEFS = [
   {key:'rounds', label:'Раундов в бою', min:3, max:20},
   {key:'hp', label:'Здоровье', min:5, max:99},
@@ -414,11 +438,13 @@ const RULE_DEFS = [
   {key:'growth', label:'Рост неиспользованного', note:'за раунд', min:0, max:5},
   {key:'max', label:'Максимум силы', min:1, max:12},
   {key:'bonus', label:'Бонус за сдержанное слово', note:'к урону при победе в обмене', min:0, max:5},
+  {key:'parryKeep', label:'Парирование после победы', note:'сила выигравшего парирования после сброса', min:0, max:12},
 ];
 const VIEW_DEFS = [
   {key:'showDamage', label:'Урон при победе на кнопках', note:'выкл — только текущая сила'},
   {key:'fullHistory', label:'История всех раундов', note:'выкл — последние 3, как в документе'},
   {key:'tug', label:'Перевес одной полосой', note:'выкл — две полоски здоровья'},
+  {key:'preview', label:'Предпросмотр исходов', note:'зажми приём (или наведи мышью) — три исхода против каждого ответа'},
 ];
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -438,6 +464,11 @@ function loadSettings(){
       const o = JSON.parse(raw);
       return {rules:{...RULES_V1, ...o.rules}, view:{...VIEW_V1, ...o.view}, mem:o.mem || {}, last:o.last || 'rock'};
     }
+    const old = localStorage.getItem(OLD_KEY);
+    if (old) {
+      const o = JSON.parse(old);
+      return {rules:{...RULES_V1}, view:{...VIEW_V1, ...o.view}, mem:o.mem || {}, last:o.last || 'rock'};
+    }
   } catch(e) {}
   return {rules:{...RULES_V1}, view:{...VIEW_V1}, mem:{}, last:'rock'};
 }
@@ -452,25 +483,38 @@ function weighted(ch){
   for (let i = 0; i < 3; i++) { t -= w[i]; if (t <= 0) return MOVES[i]; }
   return 'F';
 }
+const lastBluffed = log => { const l = log[log.length - 1]; return !!l && l.foe.intent !== l.foe.action; };
 const ENEMIES = [
   {id:'rock', name:'Скала', level:'учебный',
-   hint:'Всегда делает то, что показал. Показывает самый заряженный приём.',
+   tend:'Показывает свой самый заряженный приём.',
+   rule:'Всегда делает то, что показал.',
+   need:3,
+   seen: log => log.filter(l => l.foe.intent === l.foe.action).length,
    declare: me => argmax(me.ch),
-   act: c => c.myIntent},
+   act: c => ({m:c.myIntent, forced:true})},
   {id:'hot', name:'Горячий', level:'средний',
-   hint:'Не выдерживает, когда удар заряжен до 4+. В остальное время часто отвечает на твоё намерение.',
+   tend:'Часто отвечает на твоё намерение.',
+   rule:'Когда удар заряжен до 4 и выше — всегда показывает удар и бьёт им.',
+   need:2,
+   seen: log => log.filter(l => l.foe.ch.S >= 4).length,
    declare: me => me.ch.S >= 4 ? 'S' : weighted(me.ch),
    act: c => {
-     if (c.myIntent === 'S' && c.me.ch.S >= 4 && rnd() < .9) return 'S';
-     if (rnd() < .6) return COUNTER[c.yourIntent];
-     return c.myIntent;
+     if (c.me.ch.S >= 4) return {m:'S', forced:true};
+     return {m: rnd() < .6 ? COUNTER[c.yourIntent] : c.myIntent, forced:false};
    }},
   {id:'fox', name:'Лис', level:'хитрый',
-   hint:'Часто показывает одно, а делает другое. Но не всегда.',
+   tend:'Часто показывает одно, а делает другое.',
+   rule:'Никогда не блефует два раунда подряд.',
+   need:2,
+   seen: log => log.filter((l, i) => i > 0 && log[i - 1].foe.intent !== log[i - 1].foe.action).length,
    declare: me => weighted(me.ch),
-   act: c => rnd() < .6 ? COUNTER[COUNTER[c.myIntent]] : c.myIntent},
+   act: c => {
+     if (lastBluffed(G.log)) return {m:c.myIntent, forced:true};
+     return {m: rnd() < .7 ? COUNTER[COUNTER[c.myIntent]] : c.myIntent, forced:false};
+   }},
 ];
 const enemyById = id => ENEMIES.find(e => e.id === id) || ENEMIES[0];
+const ruleKnown = id => !!(S.mem[id] && S.mem[id].known);
 
 function computeAdapt(id){
   const m = S.mem[id];
@@ -492,12 +536,14 @@ function enemyDeclare(){
 function enemyAct(){
   const e = enemyById(G.enemyId);
   const c = {me:G.foe, myIntent:G.foe.intent, yourIntent:G.you.intent};
+  const r = e.act(c);
+  if (r.forced) return r.m;
   if (G.adapt && G.adapt.kind === 'trust' && rnd() < .45) return COUNTER[c.yourIntent];
   if (G.adapt && G.adapt.kind === 'distrust' && rnd() < .45) return c.yourIntent;
-  return e.act(c);
+  return r.m;
 }
 
-function sanitize(r){ const o = {...r}; o.start = Math.min(o.start, o.max); o.reset = Math.min(o.reset, o.max); return o; }
+function sanitize(r){ const o = {...RULES_V1, ...r}; o.start = Math.min(o.start, o.max); o.reset = Math.min(o.reset, o.max); o.parryKeep = Math.min(o.parryKeep, o.max); return o; }
 function maxDamageByRound(r0){
   const r = sanitize(r0);
   const best = [0];
@@ -508,7 +554,7 @@ function maxDamageByRound(r0){
       const c = key.split(',').map(Number);
       for (let j = 0; j < 3; j++) {
         const g = v + c[j] + r.bonus;
-        const nk = c.map((x, t) => t === j ? r.reset : Math.min(r.max, x + r.growth)).join(',');
+        const nk = c.map((x, t) => t === j ? (MOVES[j] === 'P' ? r.parryKeep : r.reset) : Math.min(r.max, x + r.growth)).join(',');
         if (!(nx.get(nk) >= g)) nx.set(nk, g);
       }
     }
@@ -761,11 +807,12 @@ function onMove(m){
   }
 }
 
-function grow(s){
+function grow(s, won){
   const r = G.rules, out = {};
   MOVES.forEach(m => {
     const before = s.ch[m];
-    s.ch[m] = m === s.action ? r.reset : Math.min(r.max, before + r.growth);
+    const used = won && m === 'P' ? r.parryKeep : r.reset;
+    s.ch[m] = m === s.action ? used : Math.min(r.max, before + r.growth);
     out[m] = s.ch[m] > before ? 'inhale' : (s.ch[m] < before ? 'exhale' : '');
   });
   return out;
@@ -826,8 +873,14 @@ async function runReveal(){
   renderHUD();
   await sleep(520); if (G !== g) return;
 
-  U.breath = grow(y); grow(f);
+  U.breath = grow(y, rec.winner === 'you'); grow(f, rec.winner === 'foe');
   G.log.push(rec); U.outcome = rec;
+  const e = enemyById(G.enemyId);
+  if (!ruleKnown(G.enemyId) && e.seen(G.log) >= e.need) {
+    S.mem[G.enemyId] = {...(S.mem[G.enemyId] || {fights:0, w:0, l:0, d:0}), known:true};
+    saveSettings();
+    pop('foe', 'привычка раскрыта', 'note acc');
+  }
   render();
 
   await waitOrTap(1900); if (G !== g) return;
@@ -845,6 +898,7 @@ function outcomeText(rec){
     const w = rec[rec.winner], base = w.ch[w.action];
     const how = rec.bonus ? ` (${base} + ${G.rules.bonus} за сдержанное слово)` : '';
     parts.push(`${VERB[w.action]}. ${rec.winner === 'you' ? 'Соперник теряет' : 'Ты теряешь'} ${rec.dmg}${how}.`);
+    if (w.action === 'P' && G.rules.parryKeep > G.rules.reset) parts.push(`Выигравшее парирование сохраняет силу ${G.rules.parryKeep}.`);
   }
   if (f.intent !== f.action) parts.push(`Соперник блефовал: показал ${LOW[f.intent]}, сыграл ${LOW[f.action]}.`);
   if (y.intent !== y.action && rec.winner) parts.push(rec.winner === 'you' ? 'Твой блеф сработал.' : 'Твой блеф не сработал.');
@@ -862,7 +916,7 @@ function endFight(){
   const cnt = {S:0, P:0, F:0}; log.forEach(l => cnt[l.you.action]++);
   const favorite = argmax(cnt);
   const prev = S.mem[G.enemyId] || {fights:0, w:0, l:0, d:0};
-  S.mem[G.enemyId] = {fights:prev.fights + 1, w:prev.w + (res === 'win'), l:prev.l + (res === 'lose'), d:prev.d + (res === 'draw'), bluffRate: n ? myBluffs.length / n : 0, favorite};
+  S.mem[G.enemyId] = {...prev, fights:prev.fights + 1, w:prev.w + (res === 'win'), l:prev.l + (res === 'lose'), d:prev.d + (res === 'draw'), bluffRate: n ? myBluffs.length / n : 0, favorite};
   saveSettings();
   const next = computeAdapt(G.enemyId);
   const e = enemyById(G.enemyId);
@@ -912,7 +966,10 @@ function renderHUD(){
   $('foeName').textContent = e.name;
   const showDecl = G.phase === 'action' || G.phase === 'reveal';
   $('foeCh').innerHTML = MOVES.map(m => `<span class="chip ${showDecl && G.foe.intent === m ? 'declared' : ''}" title="${NAME[m]}: сила ${G.foe.ch[m]}">${glyph(m)}${G.foe.ch[m]}</span>`).join('');
-  $('foeLine').innerHTML = `<b>${e.name}</b><span class="lvl">${e.level}</span> ${e.hint}${G.adapt ? `<span class="adapt">${G.adapt.text}</span>` : ''}`;
+  const known = ruleKnown(e.id);
+  $('foeLine').innerHTML = `<b>${e.name}</b><span class="lvl">${e.level}</span> ${e.tend}
+    <span class="habit ${known ? 'on' : ''}">${glyph('star')}<span>${known ? `Привычка: ${e.rule}` : 'Привычка не раскрыта — заметь её пару раз, и она откроется'}</span></span>
+    ${G.adapt ? `<span class="adapt">${G.adapt.text}</span>` : ''}`;
 }
 
 function cell(s, rec, who){
@@ -987,10 +1044,11 @@ function renderMoves(){
 function renderHint(){
   const h = $('hint'), p = $('hintText'), r = G.rules;
   h.classList.toggle('res', G.phase === 'reveal' && !!U.outcome);
-  if (G.phase === 'intent') p.innerHTML = `Покажи приём, который собираешься сыграть. Соперник покажет свой одновременно.<small>Удар бьёт финт · финт обманывает парирование · парирование ловит удар</small>`;
+  const pvTip = S.view.preview ? ' · зажми приём — увидишь исходы' : '';
+  if (G.phase === 'intent') p.innerHTML = `Покажи приём, который собираешься сыграть. Соперник покажет свой одновременно.<small>Удар бьёт финт · финт обманывает парирование · парирование ловит удар${pvTip}</small>`;
   else if (G.phase === 'action') p.innerHTML = r.bonus
-    ? `Сохрани намерение: <b>+${r.bonus} к урону</b>, если выиграешь обмен. Или смени приём — соперник показал <b>${LOW[G.foe.intent]}</b>.<small>Нажми «${NAME[G.you.intent]}» ещё раз, чтобы сдержать слово</small>`
-    : `Соперник показал <b>${LOW[G.foe.intent]}</b>. Сыграй показанный приём или смени его.`;
+    ? `Сохрани намерение: <b>+${r.bonus} к урону</b>, если выиграешь обмен. Или смени приём — соперник показал <b>${LOW[G.foe.intent]}</b>.<small>Нажми «${NAME[G.you.intent]}» ещё раз, чтобы сдержать слово${pvTip}</small>`
+    : `Соперник показал <b>${LOW[G.foe.intent]}</b>. Сыграй показанный приём или смени его.<small>${pvTip.slice(3)}</small>`;
   else if (G.phase === 'reveal') p.innerHTML = U.outcome ? `${outcomeText(U.outcome)}<small>Нажми здесь или на арену, чтобы продолжить</small>` : (U.revealed ? 'Приёмы раскрыты — смотри на арену.' : 'Карты легли рубашкой вверх…');
   else p.innerHTML = 'Бой окончен. Реванш — и соперник вспомнит, как ты играл.';
 }
@@ -1002,14 +1060,15 @@ function renderFoesPanel(){
     <div class="tri">${t('S')} бьёт ${t('F')}</div>
     <div class="tri">${t('F')} обманывает ${t('P')}</div>
     <div class="tri">${t('P')} ловит ${t('S')}</div>
-    <p>Каждый раунд оба сначала показывают намерение, потом тайно делают настоящий ход. Сдержал слово и выиграл обмен — +${r.bonus} к урону. Неиспользованные приёмы копят силу до ${r.max}, использованный падает до ${r.reset}. После ${r.rounds} раундов побеждает тот, у кого больше здоровья.</p>`;
+    <p>Каждый раунд оба сначала показывают намерение, потом тайно делают настоящий ход. Сдержал слово и выиграл обмен — +${r.bonus} к урону. Неиспользованные приёмы копят силу до ${r.max}, использованный падает до ${r.reset}${r.parryKeep > r.reset ? `, а выигравшее парирование — только до ${r.parryKeep}` : ''}. После ${r.rounds} раундов побеждает тот, у кого больше здоровья.</p>
+    <p>У каждого соперника есть склонность и одна жёсткая привычка, которую он никогда не нарушает. Заметь её пару раз в бою — и она откроется.</p>`;
   $('foesList').innerHTML = ENEMIES.map(e => {
     const m = S.mem[e.id];
     const rec = m && m.fights ? `${m.w}–${m.l}${m.d ? '–' + m.d : ''}` : 'не встречались';
     const a = computeAdapt(e.id);
     return `<button type="button" class="foe-card ${G && G.enemyId === e.id ? 'cur' : ''}" data-e="${e.id}">
       <b>${e.name}</b><span class="rec">${rec}</span>
-      <span class="h">${e.level[0].toUpperCase() + e.level.slice(1)}. ${e.hint}</span>
+      <span class="h">${e.level[0].toUpperCase() + e.level.slice(1)}. ${e.tend} ${ruleKnown(e.id) ? `<b class="hk">Привычка: ${e.rule}</b>` : 'Привычка не раскрыта.'}</span>
       ${a ? `<span class="a">${a.text}</span>` : ''}
     </button>`;
   }).join('') + `<button type="button" class="linkish" id="forget">Стереть память соперников</button>`;
@@ -1036,14 +1095,55 @@ function renderBalance(){
       ${status}
       <span class="note">Перебор всех состояний зарядов, если боец выигрывает каждый обмен и всегда держит слово.</span>
     </div>
-    <p class="note">${changed ? 'Правила изменены — применятся в новом бою.' : 'Оранжевым — отличается от версии 1.0.'}</p>
+    <p class="note">${changed ? 'Правила изменены — применятся в новом бою.' : 'Оранжевым — отличается от версии 1.1.'}</p>
     <h3>Вид</h3>
     <div>${VIEW_DEFS.map(d => `<label class="sw"><input type="checkbox" id="v-${d.key}" data-v="${d.key}" ${S.view[d.key] ? 'checked' : ''}><span>${d.label}<small>${d.note}</small></span></label>`).join('')}</div>`;
 }
 
 function closeAll(){ ['ovFoes', 'ovEnd', 'ovBal'].forEach(id => $(id).hidden = true); }
 
-$('moves').addEventListener('click', e => { const b = e.target.closest('.mv'); if (b && !b.disabled) onMove(b.dataset.m); });
+function previewHTML(m){
+  const y = G.you, f = G.foe, r = G.rules, ph = G.phase;
+  const rows = MOVES.map(e => {
+    const shown = ph === 'action' && f.intent === e;
+    let cls, res, note = '';
+    if (m === e) { cls = 'd'; res = 'ничья'; }
+    else if (BEATS[m] === e) {
+      cls = 'w'; res = `+${y.ch[m] + (ph === 'action' && y.intent === m ? r.bonus : 0)} ему`;
+      if (m === 'P' && r.parryKeep > r.reset) note = `<small>парирование сохранит силу ${r.parryKeep}</small>`;
+    } else { cls = 'l'; res = `−${f.ch[e] + (shown ? r.bonus : 0)} тебе`; }
+    return `<div class="pr ${cls}">${glyph(e)}<span>против: ${LOW[e]}${shown ? '<em>показал</em>' : ''}</span><b>${res}</b>${note}</div>`;
+  }).join('');
+  const foot = ph === 'intent' ? 'Без бонусов за слово — намерения ещё не показаны.' : (y.intent === m ? `С учётом +${r.bonus} за сдержанное слово.` : 'Ты меняешь намерение — бонуса не будет.');
+  return `<h4>${NAME[m]} — исходы</h4>${rows}<div class="pvn">${foot}</div>`;
+}
+let lpTimer = null, lpFired = false;
+function showPreview(btn){
+  if (!S.view.preview || !G || (G.phase !== 'intent' && G.phase !== 'action')) return;
+  const pv = $('pv'), wrap = pv.parentElement;
+  pv.innerHTML = previewHTML(btn.dataset.m);
+  pv.hidden = false;
+  const W = wrap.clientWidth, w = pv.offsetWidth;
+  const cx = btn.offsetLeft + btn.offsetWidth / 2;
+  const left = Math.max(0, Math.min(W - w, cx - w / 2));
+  pv.style.left = left + 'px';
+  pv.style.setProperty('--ax', (cx - left) + 'px');
+}
+function hidePreview(){ clearTimeout(lpTimer); $('pv').hidden = true; }
+$('moves').addEventListener('pointerdown', e => {
+  const b = e.target.closest('.mv'); if (!b || b.disabled) return;
+  lpFired = false; clearTimeout(lpTimer);
+  if (e.pointerType !== 'mouse') lpTimer = setTimeout(() => { lpFired = true; showPreview(b); }, 330);
+});
+['pointerup', 'pointercancel'].forEach(t => $('moves').addEventListener(t, e => { if (e.pointerType !== 'mouse') hidePreview(); }));
+$('moves').addEventListener('pointerover', e => { if (e.pointerType !== 'mouse') return; const b = e.target.closest('.mv'); if (b && !b.disabled) showPreview(b); });
+$('moves').addEventListener('pointerleave', hidePreview);
+$('moves').addEventListener('contextmenu', e => { if (e.target.closest('.mv')) e.preventDefault(); });
+$('moves').addEventListener('click', e => {
+  const b = e.target.closest('.mv');
+  if (lpFired) { lpFired = false; return; }
+  if (b && !b.disabled) { hidePreview(); onMove(b.dataset.m); }
+});
 $('hint').addEventListener('click', () => { if (skipFn) skipFn(); });
 $('stage').addEventListener('click', () => { if (skipFn) skipFn(); });
 $('btnFoes').addEventListener('click', () => { renderFoesPanel(); $('ovFoes').hidden = false; });
@@ -1071,7 +1171,7 @@ $('balReset').addEventListener('click', () => { S.rules = {...RULES_V1}; S.view 
 
 function boot(data){
   if (data && data.G && data.G.phase !== 'reveal' && data.G.phase !== 'over') {
-    G = data.G; U = freshU(); FF.setLook(G.enemyId); render();
+    G = data.G; G.rules = sanitize(G.rules); U = freshU(); FF.setLook(G.enemyId); render();
   } else newFight(S.last || 'rock');
 }
 try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({G: G ? clone(G) : null})); } catch(e) {}
