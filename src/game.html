@@ -1,0 +1,1247 @@
+<title>Выдержка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap">
+<style>
+[hidden]{display:none!important}
+:root{
+  color-scheme: light;
+  --bg:#E8E2DA; --paper:#F6F3EE; --panel:#F0EBE4; --surface:#D1CBC2; --t2:#C7C2BB; --t3:#9A958E; --t4:#6F6B64;
+  --text:#3B3B3B; --ink:#212121;
+  --acc:#F48B3D; --acc-a:#F7A25F; --acc-b:#E6792E; --acc-soft:#FBE3CF;
+  --font-d:"Roboto Condensed","Arial Narrow","Helvetica Neue",sans-serif;
+  --font-b:"Roboto","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+html,body{height:100%}
+body{margin:0;
+  background-color:var(--bg);
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .23 0 0 0 0 .2 0 0 0 0 .17 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  color:var(--text);font-family:var(--font-b);font-size:14px;line-height:1.4;-webkit-tap-highlight-color:transparent;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc-b);outline-offset:2px}
+.gl{fill:currentColor;display:block}
+.app{max-width:460px;margin:0 auto;padding-inline:16px;padding-block:12px 22px;display:flex;flex-direction:column;gap:10px}
+
+.pan{position:relative;background:var(--panel);border:1px solid color-mix(in srgb,var(--surface) 80%,transparent);border-radius:6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 1px 2px rgba(33,33,33,.06)}
+.pan::after{content:"";position:absolute;top:9px;right:8px;width:14px;height:1px;background:var(--t3);transform:rotate(-45deg);opacity:.8}
+.sec{font-family:var(--font-d);font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+
+.top{display:flex;align-items:center;gap:10px}
+.logo{width:30px;height:30px;color:var(--ink);flex:none}
+.brand{border-left:1px solid var(--t2);padding-left:10px;min-width:0}
+.bt{font-family:var(--font-d);font-weight:700;font-size:24px;line-height:1;letter-spacing:.01em;color:var(--ink);text-transform:uppercase}
+.bs{font-family:var(--font-d);font-size:13px;color:var(--t4);margin-top:2px}
+.tbtns{margin-left:auto;display:flex;gap:6px}
+.tbtn{display:flex;align-items:center;gap:5px;border:1px solid var(--t2);background:#DCD6CD;border-radius:6px;padding:7px 9px;font-family:var(--font-d);font-weight:500;font-size:12.5px;color:var(--ink);white-space:nowrap}
+.tbtn:hover{background:#D3CCC2}
+.tbtn .gl{width:14px;height:14px}
+
+.hud{padding:10px 12px 10px;display:grid;grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);gap:6px 8px;align-items:start}
+.hs{display:flex;flex-direction:column;gap:4px;min-width:0}
+.hs.foe{align-items:flex-end;text-align:right}
+.hn{display:flex;align-items:center;gap:6px;font-family:var(--font-d);font-weight:700;font-size:14.5px;color:var(--ink);min-width:0}
+.hn .gl{width:15px;height:15px;flex:none}
+.hs.you .hn .gl{color:var(--acc-b)}
+.hpv{font-family:var(--font-d);font-size:12px;color:var(--t4);font-variant-numeric:tabular-nums}
+.hpv b{font-size:16px;color:var(--ink)}
+.hb{width:100%;height:5px;background:var(--t2);border-radius:2px;overflow:hidden}
+.hb i{display:block;height:100%;background:linear-gradient(90deg,var(--acc-a),var(--acc-b));transition:width .5s}
+.hs.foe .hb{transform:scaleX(-1)}
+.hs.foe .hb i{background:var(--text)}
+.hud.tugmode .hb{display:none}
+.hc{display:grid;place-items:center;padding-top:2px}
+.dia{width:46px;height:46px;transform:rotate(45deg);border:1px solid var(--t3);display:grid;place-items:center;background:var(--paper)}
+.dia>div{transform:rotate(-45deg);text-align:center;line-height:1}
+.dia small{display:block;font-family:var(--font-d);font-size:8.5px;letter-spacing:.1em;color:var(--t4);text-transform:uppercase}
+.dia b{font-family:var(--font-d);font-size:14px;color:var(--ink);font-variant-numeric:tabular-nums}
+.tug{grid-column:1/-1;display:flex;flex-direction:column;gap:4px}
+.tugbar{position:relative;height:7px;background:var(--t2);border-radius:2px;overflow:hidden}
+.tugbar i{position:absolute;top:0;bottom:0;transition:left .5s,width .5s,background .3s}
+.tugbar .mid{left:50%;width:2px;margin-left:-1px;background:var(--ink)}
+.tuglead{text-align:center;font-family:var(--font-d);font-weight:700;font-size:12.5px;color:var(--ink)}
+.fch{display:flex;gap:4px}
+.chip{position:relative;display:flex;align-items:center;gap:3px;padding:2px 5px 2px 3px;border:1px solid var(--t2);border-radius:4px;background:var(--paper);font-family:var(--font-d);font-weight:700;font-size:12px;color:var(--ink);font-variant-numeric:tabular-nums}
+.chip .gl{width:14px;height:14px}
+.chip.declared{border-color:var(--acc);background:var(--acc-soft)}
+.chip.declared .gl{color:var(--acc-b)}
+.foe-line{grid-column:1/-1;border-top:1px dashed var(--t2);padding-top:6px;font-size:12px;color:var(--t4)}
+.foe-line b{font-family:var(--font-d);color:var(--ink);font-size:13px}
+.foe-line .lvl{font-family:var(--font-d);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--t2);border-radius:3px;padding:0 4px;margin-inline:4px 2px}
+.adapt{display:block;margin-top:4px;color:var(--ink);border-left:2px solid var(--acc);padding-left:7px}
+.habit{display:flex;align-items:flex-start;gap:6px;margin-top:5px;color:var(--t3)}
+.habit .gl{width:13px;height:13px;flex:none;margin-top:2px}
+.habit.on{color:var(--ink);font-weight:500}
+.habit.on .gl{color:var(--acc-b)}
+.foe-card .hk{color:var(--ink);font-weight:500}
+
+.shud{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;align-items:start;padding:8px 10px 0;pointer-events:none}
+.shud .side{display:flex;flex-direction:column;gap:4px;min-width:0}
+.shud .side.foe{align-items:flex-end}
+.shud .nm{font-family:var(--font-d);font-weight:700;font-size:16px;line-height:1.1;color:var(--ink);background:rgba(246,243,238,.78);border-radius:4px;padding:1px 7px;align-self:flex-start}
+.shud .side.foe .nm{align-self:flex-end}
+.foe-btn{pointer-events:auto;border:1px solid var(--t2);display:flex;align-items:center;gap:5px}
+.foe-btn::after{content:"i";font-family:var(--font-b);font-size:10px;font-weight:700;width:14px;height:14px;border-radius:50%;background:var(--t4);color:var(--paper);display:grid;place-items:center;line-height:1}
+.foe-btn:hover{border-color:var(--t4)}
+.hprow{display:flex;align-items:center;gap:6px;width:100%;max-width:150px}
+.side.foe .hprow{justify-content:flex-end}
+.bar2{flex:1;height:6px;background:rgba(111,107,100,.35);border-radius:2px;overflow:hidden;box-shadow:0 0 0 1px rgba(246,243,238,.6)}
+.bar2 i{display:block;height:100%;transition:width .5s}
+.side.you .bar2 i{background:linear-gradient(90deg,var(--acc-a),var(--acc-b))}
+.side.foe .bar2{transform:scaleX(-1)}
+.side.foe .bar2 i{background:var(--text)}
+.hpn{font-family:var(--font-d);font-size:11px;color:var(--t4);font-variant-numeric:tabular-nums;white-space:nowrap;text-shadow:0 1px 0 var(--paper)}
+.hpn b{font-size:14px;color:var(--ink)}
+.shud .mid{display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:3px}
+.shud .dia{width:38px;height:38px;background:rgba(246,243,238,.85)}
+.shud .dia small{font-size:7.5px}
+.shud .dia b{font-size:14px}
+.shud .lead{display:flex;flex-direction:column;align-items:center;gap:1px;width:78px;font-family:var(--font-d);font-size:10px;font-weight:700;color:var(--ink);text-align:center;line-height:1.1;text-shadow:0 1px 0 var(--paper)}
+.shud .lead .tugbar{width:100%;height:5px}
+.shud .fch{margin-top:1px}
+.shud .chip{font-size:11px;padding:1px 4px 1px 2px;background:rgba(246,243,238,.85)}
+.shud .chip .gl{width:12px;height:12px}
+
+.legend{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;font-family:var(--font-d);font-size:12.5px;color:var(--t4)}
+.legend::after{display:none}
+.lg{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+.lg b{display:inline-flex;align-items:center;gap:4px;color:var(--ink);font-weight:700}
+.lg .gl{width:14px;height:14px}
+
+.slots{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sl{position:relative;border:1px solid var(--t2);border-radius:4px;background:rgba(255,255,255,.45);min-height:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:14px 4px 5px;transition:border-color .2s,box-shadow .2s}
+.sl .sn{position:absolute;top:3px;left:6px;font-family:var(--font-d);font-weight:700;font-size:11px;color:var(--t3)}
+.sl small{font-size:9px;color:var(--t4);text-transform:uppercase;letter-spacing:.06em}
+.sl.active{border-color:var(--acc);box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 25%,transparent);background:#FFF8F1}
+.sl.active .sn{color:var(--acc-b)}
+.sv{display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--font-d);font-size:12px;font-weight:500;color:var(--ink);text-align:center;line-height:1.1;min-height:36px;justify-content:center}
+.sv .gl{width:22px;height:22px}
+.ibox.foe .sv .gl{color:var(--acc-b)}
+.sv .muted{color:var(--t3);font-weight:400;font-size:11.5px}
+.sl .blf{display:none;position:absolute;top:3px;right:4px;background:var(--ink);color:var(--paper);font-size:8.5px;font-weight:700;letter-spacing:.08em;padding:1px 4px;border-radius:3px;text-transform:uppercase}
+.ibox.bluff .slot1{animation:crack .45s}
+.ibox.bluff .slot1 .blf{display:block}
+.ibox.bluff .slot1 .sv{opacity:.55;text-decoration:line-through;text-decoration-thickness:1.5px}
+.slot2 .card{width:32px;height:40px}
+.foe-info{display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--text)}
+.foe-info .row{display:flex;flex-direction:column;gap:2px;padding-bottom:7px;border-bottom:1px dashed var(--t2)}
+.foe-info .row span:first-child{font-family:var(--font-d);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--t4)}
+.foe-info .hidden{color:var(--t3)}
+.foe-info .on{color:var(--ink);font-weight:500}
+
+.moves-wrap{position:relative}
+.pv{position:absolute;bottom:calc(100% + 8px);width:min(250px,100%);z-index:5;background:var(--ink);color:var(--paper);border-radius:6px;padding:9px 10px 8px;box-shadow:0 10px 26px rgba(33,33,33,.3);pointer-events:none}
+.pv::after{content:"";position:absolute;top:100%;left:var(--ax,50%);margin-left:-6px;border:6px solid transparent;border-top-color:var(--ink)}
+.pv h4{margin:0 0 6px;font-family:var(--font-d);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--acc-a)}
+.pr{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:7px;align-items:center;font-size:12.5px;padding:3px 0;border-top:1px solid rgba(246,243,238,.12)}
+.pr .gl{width:15px;height:15px}
+.pr em{font-style:normal;font-size:10px;background:var(--acc-b);color:#fff;border-radius:3px;padding:0 4px;margin-left:4px}
+.pr b{font-family:var(--font-d);font-size:13.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pr.w b{color:var(--acc-a)}
+.pr.l b{color:#C7C2BB}
+.pr.d b{color:#9A958E;font-weight:500}
+.pr small{grid-column:2/-1;color:#C7C2BB;font-size:10.5px;margin-top:-2px}
+.pv .pvn{font-size:10.5px;color:#9A958E;margin-top:4px}
+.mv{touch-action:manipulation;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+
+.hist{padding:9px 12px 8px;display:flex;flex-direction:column;gap:6px}
+.hist-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding-right:18px}
+.hist-top small{font-size:10.5px;color:var(--t4)}
+.hrow{display:flex;gap:3px}
+.hlab{display:flex;flex-direction:column;gap:3px;width:34px;flex:none}
+.hlab span{flex:1;display:flex;align-items:center;font-family:var(--font-d);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--t4)}
+.hlab span:last-child{flex:0 0 13px}
+.hcol{flex:1 1 0;min-width:0;max-width:40px;display:flex;flex-direction:column;gap:3px}
+.hcol .hn2{flex:0 0 13px;text-align:center;font-family:var(--font-d);font-size:10px;color:var(--t3);font-variant-numeric:tabular-nums}
+.hcol.now .hn2{color:var(--acc-b);font-weight:700}
+.cell{aspect-ratio:1;min-height:0;overflow:hidden;position:relative;border-radius:3px;background:var(--paper);border:1px solid var(--t2);color:var(--ink)}
+.cell>.gl{position:absolute;left:20%;top:20%;width:60%;height:60%}
+.cell.empty{background:transparent;border-style:dashed}
+.hcol.now .cell.empty{border-color:var(--acc)}
+.cell.won-you{background:linear-gradient(160deg,var(--acc-a),var(--acc-b));border-color:var(--acc-b)}
+.cell.won-foe{background:var(--text);border-color:var(--ink);color:var(--paper)}
+.cell.lost{opacity:.45}
+.cell .was{position:absolute;top:1px;left:1px;width:38%;height:38%;opacity:.85}
+.cell .was .gl{width:100%;height:100%}
+.cell .was::after{content:"";position:absolute;left:-15%;right:-15%;top:48%;height:1.5px;background:currentColor;transform:rotate(-40deg)}
+.cell .dmg{position:absolute;bottom:0;right:2px;font-family:var(--font-d);font-size:9.5px;font-weight:700;font-variant-numeric:tabular-nums}
+
+.stage{position:relative;aspect-ratio:360/220;max-width:100%;border-radius:6px;overflow:hidden;border:1px solid var(--t2);background:#E3DDD4;user-select:none;-webkit-user-select:none}
+.stage svg.scene{position:absolute;inset:0;width:100%;height:100%}
+.banner{transform-box:fill-box;transform-origin:50% 0;animation:flag 4.2s ease-in-out infinite}
+.banner.r{animation-delay:-1.6s}
+@keyframes flag{0%,100%{transform:skewX(0) scaleX(1)}50%{transform:skewX(3deg) scaleX(.96)}}
+.dust{animation:dust 9s linear infinite;opacity:0}
+@keyframes dust{0%{opacity:0;transform:translate(0,0)}15%{opacity:.7}100%{opacity:0;transform:translate(26px,-40px)}}
+.spark{transform-box:fill-box;transform-origin:50% 50%;opacity:0}
+.spark.go{animation:spark .42s ease-out}
+@keyframes spark{0%{opacity:1;transform:scale(.2) rotate(0)}60%{opacity:1}100%{opacity:0;transform:scale(1.35) rotate(25deg)}}
+.flash{position:absolute;inset:0;background:var(--c,#fff);opacity:0;pointer-events:none;mix-blend-mode:multiply}
+.flash.go{animation:flash .45s ease-out}
+@keyframes flash{0%{opacity:.28}100%{opacity:0}}
+.pop{position:absolute;top:30%;transform:translateX(-50%);font-family:var(--font-d);font-weight:700;font-size:26px;color:var(--ink);text-shadow:0 1px 0 var(--paper),0 0 10px var(--paper);animation:popup 1.4s forwards;pointer-events:none;white-space:nowrap}
+.pop.you{color:var(--acc-b)}
+.pop.note{font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-shadow:none;background:var(--ink);color:var(--paper);padding:2px 7px;border-radius:3px;top:24%}
+.pop.note.acc{background:var(--acc-b)}
+@keyframes popup{0%{opacity:0;transform:translate(-50%,8px)}14%{opacity:1;transform:translate(-50%,0)}78%{opacity:1}100%{opacity:0;transform:translate(-50%,-14px)}}
+.stage-tag{position:absolute;left:8px;bottom:6px;font-family:var(--font-d);font-size:9.5px;letter-spacing:.14em;color:var(--t4);text-transform:uppercase;pointer-events:none}
+
+.phase{display:flex;align-items:center;gap:10px;padding:8px 12px}
+.pn{width:30px;height:30px;border-radius:50%;background:linear-gradient(160deg,var(--acc-a),var(--acc-b));color:#fff;display:grid;place-items:center;font-family:var(--font-d);font-weight:700;font-size:16px;flex:none;box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 22%,transparent)}
+.pn.done{background:var(--text);box-shadow:none}
+.pt{font-family:var(--font-d);font-weight:700;font-size:16px;color:var(--ink)}
+.ps{margin-left:auto;font-size:11px;color:var(--t4);text-align:right;line-height:1.25;max-width:42%}
+
+.intents{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ibox{padding:8px 10px;display:grid;grid-template-columns:1fr;gap:6px;align-items:center}
+.ibox.foe{background:color-mix(in srgb,var(--acc-soft) 55%,var(--panel))}
+.ibox::after{display:none}
+.il{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t4)}
+.il .gl{width:15px;height:15px;color:var(--ink);margin-left:auto}
+.iv{display:flex;align-items:center;gap:7px;min-height:30px;background:rgba(255,255,255,.45);border-radius:4px;padding:3px 7px;font-family:var(--font-d);font-weight:500;font-size:13px;color:var(--ink);position:relative;min-width:0}
+.iv .gl{width:20px;height:20px;flex:none}
+.ibox.foe .iv .gl{color:var(--acc-b)}
+.iv .muted{color:var(--t3);font-weight:400}
+.iv .blf{display:none;position:absolute;top:-8px;right:-4px;background:var(--ink);color:var(--paper);font-size:9px;font-weight:700;letter-spacing:.08em;padding:1px 5px;border-radius:3px;text-transform:uppercase}
+.ibox.bluff .iv{animation:crack .45s}
+.ibox.bluff .iv>span:not(.blf){text-decoration:line-through;text-decoration-thickness:1.5px;color:var(--t4)}
+.ibox.bluff .iv .blf{display:block}
+@keyframes crack{20%{transform:translateX(-3px) rotate(-2deg)}40%{transform:translateX(3px) rotate(1.5deg)}60%{transform:translateX(-2px)}}
+.fin{display:flex;flex-direction:column;align-items:center;gap:2px}
+.fin small{font-size:9px;color:var(--t4);text-transform:uppercase;letter-spacing:.06em}
+.card{width:30px;height:38px;perspective:300px}
+.cin{position:relative;width:100%;height:100%;transition:transform .42s cubic-bezier(.3,.7,.2,1);transform-style:preserve-3d}
+.card.flipped .cin{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:4px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid;place-items:center}
+.face.back{background:#8E8981;color:var(--paper);font-family:var(--font-d);font-weight:700;font-size:18px;border:1px solid var(--t4);box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)}
+.face.front{transform:rotateY(180deg);background:var(--paper);border:1px solid var(--ink);color:var(--ink)}
+.face.front .gl{width:20px;height:20px}
+.ibox.you .face.front{background:linear-gradient(160deg,var(--acc-a),var(--acc-b));border-color:var(--acc-b)}
+
+.moves{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mv{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:18px 4px 10px;border-radius:5px;border:1px solid var(--t2);background:linear-gradient(170deg,var(--paper),#E9E4DC);color:var(--ink);box-shadow:0 1px 2px rgba(33,33,33,.08);transition:transform .15s,opacity .3s}
+.mv:not(:disabled):hover{border-color:var(--t3)}
+.mv:not(:disabled):active{transform:scale(.97)}
+.mv:disabled{cursor:default}
+.mv .idx{position:absolute;top:5px;left:7px;font-family:var(--font-d);font-size:10px;color:var(--t4)}
+.mv .plus{position:absolute;top:3px;right:7px;font-size:13px;line-height:1;color:var(--t3)}
+.mv .eye{position:absolute;top:5px;right:6px;color:var(--ink)}
+.mv .eye .gl{width:15px;height:15px}
+.mv .big-g{width:calc(30px + var(--ch) * 2.4px);height:calc(30px + var(--ch) * 2.4px);transition:width .4s,height .4s}
+.mv .mn{font-family:var(--font-d);font-weight:700;font-size:clamp(11px,3.2vw,13.5px);letter-spacing:.03em;text-transform:uppercase;margin-top:4px}
+.mv .pw{font-family:var(--font-d);font-weight:700;font-size:25px;line-height:1.05;font-variant-numeric:tabular-nums;display:flex;align-items:flex-start;gap:2px}
+.mv .pw em{font-style:normal;font-size:10.5px;background:var(--ink);color:var(--paper);border-radius:3px;padding:1px 4px;margin-top:3px}
+.mv .pl{font-size:9.5px;color:var(--t4);text-transform:uppercase;letter-spacing:.05em;text-align:center;line-height:1.2}
+.pips{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-top:5px}
+.pips i{width:7px;height:7px;border-radius:50%;background:var(--t2)}
+.pips i.on{background:var(--acc)}
+.mv.declared{background:linear-gradient(170deg,#FCEEE2,var(--acc-soft));border-color:var(--acc)}
+.mv.declared .big-g{color:var(--acc-b)}
+.mv.chosen{background:linear-gradient(165deg,var(--acc-a),var(--acc-b));border-color:var(--acc-b)}
+.mv.chosen .pips i.on{background:var(--ink)}
+.mv.chosen .pl{color:var(--ink)}
+.mv.declared,.mv.chosen{
+  --k:var(--ink);
+  background-image:
+    linear-gradient(var(--k),var(--k)),linear-gradient(var(--k),var(--k)),
+    linear-gradient(var(--k),var(--k)),linear-gradient(var(--k),var(--k)),
+    linear-gradient(var(--k),var(--k)),linear-gradient(var(--k),var(--k)),
+    linear-gradient(var(--k),var(--k)),linear-gradient(var(--k),var(--k)),
+    var(--bgfill);
+  background-repeat:no-repeat;
+  background-size:12px 2px,2px 12px,12px 2px,2px 12px,12px 2px,2px 12px,12px 2px,2px 12px,100% 100%;
+  background-position:3px 3px,3px 3px,calc(100% - 3px) 3px,calc(100% - 3px) 3px,3px calc(100% - 3px),3px calc(100% - 3px),calc(100% - 3px) calc(100% - 3px),calc(100% - 3px) calc(100% - 3px),0 0;
+}
+.mv.declared{--k:var(--acc-b);--bgfill:linear-gradient(170deg,#FCEEE2,var(--acc-soft))}
+.mv.chosen{--bgfill:linear-gradient(165deg,var(--acc-a),var(--acc-b))}
+.mv.dim{opacity:.45}
+.mv.full::before{content:"";position:absolute;inset:-4px;border-radius:8px;border:2px solid var(--acc);opacity:0;animation:ring 1.8s ease-out infinite;pointer-events:none}
+@keyframes ring{0%{opacity:.8;transform:scale(.97)}100%{opacity:0;transform:scale(1.04)}}
+.mv.inhale .big-g{animation:inhale .8s ease-out}
+.mv.exhale .big-g{animation:exhale .8s ease-out}
+@keyframes inhale{40%{transform:scale(1.2)}}
+@keyframes exhale{40%{transform:scale(.8);opacity:.5}}
+
+.hint{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;min-height:58px}
+.hint::after{display:none}
+.hint>.gl{width:22px;height:22px;color:var(--acc);flex:none;margin-top:1px}
+.hint p{margin:0;font-size:13.5px;color:var(--ink);text-wrap:pretty}
+.hint p small{display:block;color:var(--t3);font-size:11px;margin-top:3px}
+.hint.res{cursor:pointer}
+
+.ov{position:fixed;inset:0;z-index:10;background:rgba(33,33,33,.45);display:flex;align-items:flex-end;justify-content:center;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));padding-top:calc(16px + env(safe-area-inset-top,0px))}
+.panel{background:var(--panel);width:100%;max-width:440px;max-height:100%;overflow:auto;border-radius:8px;border:1px solid var(--t2);padding:18px 18px 16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 50px rgba(33,33,33,.3)}
+.panel h2{font-family:var(--font-d);font-weight:700;font-size:20px;margin:0;text-transform:uppercase;letter-spacing:.02em;color:var(--ink);text-wrap:balance}
+.panel h3{font-family:var(--font-d);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--t4);margin:4px 0 0}
+.panel p{margin:0}
+.ph-row{display:flex;align-items:center;gap:10px}
+.x{margin-left:auto;border:0;background:transparent;font-size:24px;line-height:1;padding:2px 6px;color:var(--t4)}
+.rules-mini{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--t4)}
+.tri{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;color:var(--ink);font-family:var(--font-d);font-weight:500}
+.tri .t{display:inline-flex;align-items:center;gap:4px;font-weight:700}
+.tri .t .gl{width:16px;height:16px}
+.foes{display:flex;flex-direction:column;gap:8px}
+.foe-card{display:grid;grid-template-columns:1fr auto;gap:2px 10px;text-align:left;border:1px solid var(--t2);background:var(--paper);border-radius:5px;padding:11px 13px}
+.foe-card:hover{border-color:var(--t4)}
+.foe-card.cur{border-color:var(--acc);box-shadow:inset 3px 0 0 var(--acc)}
+.foe-card b{font-family:var(--font-d);font-size:16px;color:var(--ink)}
+.foe-card .rec{font-family:var(--font-d);font-size:12px;color:var(--t4);text-align:right;font-variant-numeric:tabular-nums}
+.foe-card .h{grid-column:1/-1;font-size:12.5px;color:var(--t4)}
+.foe-card .a{grid-column:1/-1;font-size:12px;color:var(--ink);border-left:2px solid var(--acc);padding-left:7px;margin-top:4px}
+.end-head{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding-top:4px}
+.end-head .gl{width:34px;height:34px;color:var(--acc)}
+.big{font-family:var(--font-d);font-weight:700;font-size:32px;line-height:1.05;color:var(--ink)}
+.end-sub{font-size:12.5px;color:var(--t4)}
+.score{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.score>div{background:var(--paper);border:1px solid var(--t2);border-radius:5px;padding:7px 10px;display:flex;flex-direction:column;gap:4px}
+.score .lab{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--t4)}
+.score .lab .gl{width:14px;height:14px;color:var(--acc-b)}
+.score .lab b{margin-left:auto;font-family:var(--font-d);font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+.stats{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.stats div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--t2);padding-bottom:3px}
+.stats span:last-child{font-family:var(--font-d);font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.log-wrap{overflow-x:auto}
+table.log{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
+.log th{font-family:var(--font-d);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--t4);text-align:left;font-weight:500;padding:4px}
+.log td{padding:5px 4px;border-top:1px solid var(--t2);white-space:nowrap}
+.pair{display:inline-flex;align-items:center;gap:3px;vertical-align:middle}
+.pair .gl{width:15px;height:15px}
+.pair.bl{opacity:.5;text-decoration:line-through}
+.pair.ar{color:var(--t3)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:8px;border:0;background:linear-gradient(180deg,var(--acc-a),var(--acc-b));color:#fff;border-radius:6px;padding:11px 14px;font-family:var(--font-d);font-weight:700;font-size:15px;box-shadow:0 2px 0 #C9621F}
+.btn .gl{width:16px;height:16px}
+.btn.alt{background:#DCD6CD;color:var(--ink);box-shadow:0 2px 0 var(--t2);border:1px solid var(--t2)}
+.st{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--t2)}
+.sl{font-size:13px;color:var(--ink)}
+.sl small{display:block;font-size:11px;color:var(--t3)}
+.ctl{display:flex;align-items:center;gap:4px;flex:none}
+.sb{width:32px;height:32px;border-radius:5px;border:1px solid var(--t2);background:var(--paper);font-size:17px;line-height:1}
+.sb:hover{border-color:var(--t4)}
+.ctl output{min-width:30px;text-align:center;font-family:var(--font-d);font-weight:700;font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+.ctl output.chg{color:var(--acc-b)}
+.inv{font-size:12.5px;background:var(--paper);border:1px solid var(--t2);border-radius:5px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.inv b{font-variant-numeric:tabular-nums;color:var(--ink)}
+.inv .ok{color:var(--ink);font-weight:700}
+.inv .warn{color:var(--acc-b);font-weight:700}
+.sw{display:flex;align-items:flex-start;gap:10px;font-size:13px;padding:5px 0;cursor:pointer;color:var(--ink)}
+.sw input{width:18px;height:18px;margin:1px 0 0;accent-color:var(--acc-b);flex:none}
+.sw small{display:block;font-size:11px;color:var(--t3)}
+.note{font-size:12px;color:var(--t4)}
+.linkish{border:0;background:none;padding:0;text-decoration:underline;font-size:12px;color:var(--t4);align-self:flex-start}
+
+.brand{flex:1 1 auto}
+@media (max-width:440px){ .tbtn span{display:none} .tbtn{padding:8px} .tbtn .gl{width:17px;height:17px} }
+@media (max-width:360px){ .bt{font-size:21px} }
+@media (prefers-reduced-motion: reduce){
+  .banner,.dust,.mv.full::before{animation:none}
+  .cin{transition-duration:.01s}
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="g-S" viewBox="0 0 24 24"><path d="M5 9 L7.2 6 L17 6 L19.2 8.2 L19.2 15 L16 20 L8.8 20 L5 15.4Z"/><path d="M9.6 6.2V10.6 M13 6.2V10.6 M16.4 6.6V10.6 M5.2 12.2H11 L12.2 14.4" fill="none" stroke="rgba(246,243,238,.72)" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="g-P" viewBox="0 0 24 24"><path d="M12 2.5 L20 5.5 L19 13 L12 21.5 L5 13 L4 5.5Z"/><path d="M12 2.5 L20 5.5 L19 13 L12 21.5Z" fill="rgba(246,243,238,.3)"/></symbol>
+  <symbol id="g-F" viewBox="0 0 24 24"><path d="M3.5 20 C3.5 12 8 7.8 14 7.8 V4 L21 10.5 L14 17 V13 C9.5 13 6 15.2 3.5 20Z"/><path d="M14 4 L21 10.5 L14 10.5Z" fill="rgba(246,243,238,.3)"/></symbol>
+  <symbol id="g-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.8"/></symbol>
+  <symbol id="g-star" viewBox="0 0 24 24"><path d="M12 .5 L13.7 10.3 L23.5 12 L13.7 13.7 L12 23.5 L10.3 13.7 L.5 12 L10.3 10.3Z"/><path d="M12 .5 L13.7 10.3 L12 12Z M23.5 12 L13.7 13.7 L12 12Z M12 23.5 L10.3 13.7 L12 12Z M.5 12 L10.3 10.3 L12 12Z" fill="rgba(246,243,238,.4)"/><path d="M5.5 5.5 L18.5 18.5 M18.5 5.5 L5.5 18.5" stroke="currentColor" stroke-width=".7" opacity=".6"/></symbol>
+  <symbol id="g-heart" viewBox="0 0 24 24"><path d="M12 21 L3.5 12.5 C1 10 1.5 5.5 5.5 4.6 C8 4 10.5 5.5 12 7.5 C13.5 5.5 16 4 18.5 4.6 C22.5 5.5 23 10 20.5 12.5Z"/></symbol>
+  <symbol id="g-bulb" viewBox="0 0 24 24"><path d="M12 2.5a6.5 6.5 0 0 0-4 11.6V17h8v-2.9a6.5 6.5 0 0 0-4-11.6z M9 18.4h6v1.7H9z M10 21h4v1.5h-4z"/></symbol>
+  <symbol id="g-crown" viewBox="0 0 24 24"><path d="M3 8 L7.5 12 L12 4.5 L16.5 12 L21 8 L19 18 H5Z M5 19.5h14V21H5z"/></symbol>
+  <symbol id="g-swords" viewBox="0 0 24 24"><path d="M4 3 L15 14 M20 3 L9 14 M7 15 L3.5 18.5 M17 15 L20.5 18.5 M12.5 15.5 L16.5 19.5 M11.5 15.5 L7.5 19.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="g-sliders" viewBox="0 0 24 24"><path d="M3 7h10 M18 7h3 M3 17h4 M12 17h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="15.5" cy="7" r="2.6"/><circle cx="9.5" cy="17" r="2.6"/></symbol>
+  <symbol id="g-redo" viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.1-5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><path d="M18.6 3.2V8h-4.8" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="app">
+  <header class="top">
+    <svg class="logo" aria-hidden="true"><use href="#g-star"/></svg>
+    <div class="brand"><div class="bt">Выдержка</div><div class="bs">Дуэль намерений</div></div>
+    <div class="tbtns">
+      <button class="tbtn" id="btnFoes" type="button" aria-label="Соперники"><svg class="gl" aria-hidden="true"><use href="#g-swords"/></svg><span>Соперники</span></button>
+      <button class="tbtn" id="btnBal" type="button" aria-label="Баланс"><svg class="gl" aria-hidden="true"><use href="#g-sliders"/></svg><span>Баланс</span></button>
+    </div>
+  </header>
+
+  <section class="hist pan" aria-label="История раундов">
+    <div class="hist-top"><span class="sec">История</span><small>зачёркнуто — показал, но сменил</small></div>
+    <div class="hrow" id="hist"></div>
+  </section>
+
+  <section class="stage" id="stage" aria-label="Арена">
+    <svg class="scene" id="scene" viewBox="0 0 360 220" aria-hidden="true">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D6D0C7"/><stop offset=".7" stop-color="#EAE6DF"/><stop offset="1" stop-color="#E4DFD7"/></linearGradient>
+        <linearGradient id="fog" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6F3EE" stop-opacity="0"/><stop offset=".55" stop-color="#F6F3EE" stop-opacity=".55"/><stop offset="1" stop-color="#F6F3EE" stop-opacity="0"/></linearGradient>
+        <linearGradient id="capeHero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7A25F"/><stop offset="1" stop-color="#E6792E"/></linearGradient>
+        <linearGradient id="bannerO" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7A25F"/><stop offset="1" stop-color="#E6792E"/></linearGradient>
+      </defs>
+      <rect width="360" height="220" fill="url(#sky)"/>
+      <g id="bgArch"></g>
+      <g id="bgFloor"></g>
+      <rect y="92" width="360" height="100" fill="url(#fog)"/>
+      <g>
+        <path d="M30 14 V150" stroke="#6F6B64" stroke-width="1.6"/>
+        <path d="M24 16 H36" stroke="#6F6B64" stroke-width="2"/>
+        <g class="banner"><path d="M18 18 H42 V84 L30 94 L18 84Z" fill="url(#bannerO)"/><path d="M30 18 V94 L18 84 V18Z" fill="#C9621F" opacity=".35"/>
+          <g transform="translate(30 48) scale(.62)"><path d="M0 -18 L2.6 -2.6 L18 0 L2.6 2.6 L0 18 L-2.6 2.6 L-18 0 L-2.6 -2.6Z" fill="#F6F3EE"/></g></g>
+        <path d="M330 14 V150" stroke="#6F6B64" stroke-width="1.6"/>
+        <path d="M324 16 H336" stroke="#6F6B64" stroke-width="2"/>
+        <g class="banner r"><path d="M318 18 H342 V84 L330 94 L318 84Z" fill="#3B3B3B"/><path d="M330 18 V94 L342 84 V18Z" fill="#212121" opacity=".45"/>
+          <path d="M333 38 a10 10 0 1 0 0 20 a8 8 0 1 1 0 -20Z" fill="#D1CBC2"/></g>
+      </g>
+      <g id="dust"></g>
+      <g transform="translate(120 200)"><ellipse id="shY" cx="0" cy="1" rx="24" ry="3.2" fill="#212121" opacity=".18"/><g id="figY"></g></g>
+      <g transform="translate(240 200) scale(-1 1)"><ellipse id="shF" cx="0" cy="1" rx="24" ry="3.2" fill="#212121" opacity=".18"/><g id="figF"></g></g>
+      <g id="sparkPos" transform="translate(180 130)"><path class="spark" id="spark" d="M0 -16 L3 -4 L15 -8 L5 0 L16 7 L3 4 L0 17 L-3 4 L-15 9 L-5 0 L-14 -9 L-3 -4Z" fill="#F48B3D" stroke="#F6F3EE" stroke-width="1.2"/></g>
+    </svg>
+    <div class="flash" id="flash"></div>
+    <div class="stage-tag">Janken inspired · tactical duel</div>
+    <div class="shud" aria-label="Состояние боя">
+      <div class="side you">
+        <div class="nm">Я</div>
+        <div class="hprow"><div class="bar2"><i id="barY"></i></div><span class="hpn"><b id="hpY">45</b>/<span id="hpMY">45</span></span></div>
+      </div>
+      <div class="mid">
+        <div class="dia"><div><small>Раунд</small><b id="rnd">1</b></div></div>
+        <div class="lead" id="lead" hidden><div class="tugbar"><i id="tugFill"></i><i class="mid"></i></div><span id="tugLead">Поровну</span></div>
+      </div>
+      <div class="side foe">
+        <button type="button" class="nm foe-btn" id="foeName" aria-label="Карточка соперника">Скала</button>
+        <div class="hprow"><span class="hpn"><b id="hpF">45</b>/<span id="hpMF">45</span></span><div class="bar2"><i id="barF"></i></div></div>
+        <div class="fch" id="foeCh"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="legend pan" aria-label="Кто кого бьёт">
+    <div class="lg"><b><svg class="gl" aria-hidden="true"><use href="#g-S"/></svg>Удар</b> бьёт <b><svg class="gl" aria-hidden="true"><use href="#g-F"/></svg>Финт</b></div>
+    <div class="lg"><b><svg class="gl" aria-hidden="true"><use href="#g-F"/></svg>Финт</b> обманывает <b><svg class="gl" aria-hidden="true"><use href="#g-P"/></svg>Парирование</b></div>
+    <div class="lg"><b><svg class="gl" aria-hidden="true"><use href="#g-P"/></svg>Парирование</b> ловит <b><svg class="gl" aria-hidden="true"><use href="#g-S"/></svg>Удар</b></div>
+  </section>
+
+  <section class="intents">
+    <div class="ibox pan you" id="ib-you">
+      <div class="il">Твоё намерение <svg class="gl" aria-hidden="true"><use href="#g-eye"/></svg></div>
+      <div class="slots">
+        <div class="sl slot1"><span class="sn">1</span><span class="blf">блеф</span><div class="sv"></div><small>показал</small></div>
+        <div class="sl slot2"><span class="sn">2</span><div class="card"><div class="cin"><div class="face back">?</div><div class="face front"></div></div></div><small>сыграл</small></div>
+      </div>
+    </div>
+    <div class="ibox pan foe" id="ib-foe">
+      <div class="il">Намерение соперника <svg class="gl" aria-hidden="true"><use href="#g-eye"/></svg></div>
+      <div class="slots">
+        <div class="sl slot1"><span class="sn">1</span><span class="blf">блеф</span><div class="sv"></div><small>показал</small></div>
+        <div class="sl slot2"><span class="sn">2</span><div class="card"><div class="cin"><div class="face back">?</div><div class="face front"></div></div></div><small>сыграл</small></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="moves-wrap">
+    <div class="pv" id="pv" hidden role="tooltip"></div>
+    <section class="moves" id="moves" aria-label="Твои приёмы"></section>
+  </div>
+
+  <section class="hint pan" id="hint" aria-live="polite"><svg class="gl" aria-hidden="true"><use href="#g-bulb"/></svg><p id="hintText"></p></section>
+</div>
+
+<div class="ov" id="ovFoes" hidden>
+  <div class="panel" role="dialog" aria-labelledby="foesTitle">
+    <div class="ph-row"><h2 id="foesTitle">Выбери соперника</h2><button class="x" type="button" data-close="ovFoes" aria-label="Закрыть">×</button></div>
+    <div class="rules-mini" id="rulesMini"></div>
+    <div class="foes" id="foesList"></div>
+  </div>
+</div>
+
+<div class="ov" id="ovFoe" hidden>
+  <div class="panel" role="dialog" aria-labelledby="foeInfoTitle">
+    <div class="ph-row"><h2 id="foeInfoTitle">Соперник</h2><button class="x" type="button" data-close="ovFoe" aria-label="Закрыть">×</button></div>
+    <div class="foe-info" id="foeInfo"></div>
+    <div class="btns"><button class="btn alt" type="button" id="btnSwitch">Сменить соперника</button></div>
+  </div>
+</div>
+
+<div class="ov" id="ovEnd" hidden>
+  <div class="panel" role="dialog" aria-labelledby="endTitle">
+    <div id="endBody"></div>
+    <div class="btns">
+      <button class="btn" type="button" id="btnRematch"><svg class="gl" aria-hidden="true"><use href="#g-redo"/></svg>Реванш</button>
+      <button class="btn alt" type="button" id="btnOther">Другой соперник</button>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="ovBal" hidden>
+  <div class="panel" role="dialog" aria-labelledby="balTitle">
+    <div class="ph-row"><h2 id="balTitle">Баланс и вид</h2><button class="x" type="button" data-close="ovBal" aria-label="Закрыть">×</button></div>
+    <div id="balBody"></div>
+    <div class="btns">
+      <button class="btn" type="button" id="balApply">Новый бой с этими правилами</button>
+      <button class="btn alt" type="button" id="balReset">Вернуть 1.1</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+const KEY = 'vyderzhka-proto-v2';
+const OLD_KEY = 'vyderzhka-proto-v1';
+const NS = 'http://www.w3.org/2000/svg';
+const MOVES = ['S','P','F'];
+const NAME = {S:'Удар', P:'Парирование', F:'Финт'};
+const LOW = {S:'удар', P:'парирование', F:'финт'};
+const BEATS = {S:'F', P:'S', F:'P'};
+const COUNTER = {S:'P', P:'F', F:'S'};
+const VERB = {S:'Удар бьёт финт', P:'Парирование ловит удар', F:'Финт обманывает парирование'};
+const RULES_V1 = {rounds:10, hp:45, start:2, reset:1, growth:1, max:5, bonus:1, parryKeep:2};
+const VIEW_V1 = {showDamage:true, fullHistory:true, lead:false, preview:true};
+const RULE_DEFS = [
+  {key:'rounds', label:'Раундов в бою', min:3, max:20},
+  {key:'hp', label:'Здоровье', min:5, max:99},
+  {key:'start', label:'Стартовая сила приёма', min:1, max:12},
+  {key:'reset', label:'Сила после использования', min:0, max:12},
+  {key:'growth', label:'Рост неиспользованного', note:'за раунд', min:0, max:5},
+  {key:'max', label:'Максимум силы', min:1, max:12},
+  {key:'bonus', label:'Бонус за сдержанное слово', note:'к урону при победе в обмене', min:0, max:5},
+  {key:'parryKeep', label:'Парирование после победы', note:'сила выигравшего парирования после сброса', min:0, max:12},
+];
+const VIEW_DEFS = [
+  {key:'showDamage', label:'Урон при победе на кнопках', note:'выкл — только текущая сила'},
+  {key:'fullHistory', label:'История всех раундов', note:'выкл — последние 3, как в документе'},
+  {key:'lead', label:'Полоса перевеса', note:'под ромбом раунда, в дополнение к полоскам здоровья'},
+  {key:'preview', label:'Предпросмотр исходов', note:'зажми приём (или наведи мышью) — три исхода против каждого ответа'},
+];
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const TS = reduce ? 0.05 : 1;
+const sleep = ms => new Promise(r => setTimeout(r, ms * TS));
+const $ = id => document.getElementById(id);
+const rnd = Math.random;
+const pick = a => a[Math.floor(rnd() * a.length)];
+const glyph = (m, cls='') => `<svg class="gl ${cls}" aria-hidden="true"><use href="#g-${m}"/></svg>`;
+const pct = x => Math.round(x * 100) + '%';
+const clone = o => JSON.parse(JSON.stringify(o));
+
+function loadSettings(){
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      const o = JSON.parse(raw);
+      return {rules:{...RULES_V1, ...o.rules}, view:{...VIEW_V1, ...o.view}, mem:o.mem || {}, last:o.last || 'rock'};
+    }
+    const old = localStorage.getItem(OLD_KEY);
+    if (old) {
+      const o = JSON.parse(old);
+      return {rules:{...RULES_V1}, view:{...VIEW_V1, ...o.view}, mem:o.mem || {}, last:o.last || 'rock'};
+    }
+  } catch(e) {}
+  return {rules:{...RULES_V1}, view:{...VIEW_V1}, mem:{}, last:'rock'};
+}
+function saveSettings(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} }
+const S = loadSettings();
+
+/* ---------- соперники ---------- */
+function argmax(ch){ const top = Math.max(...MOVES.map(m => ch[m])); return pick(MOVES.filter(m => ch[m] === top)); }
+function weighted(ch){
+  const w = MOVES.map(m => ch[m] * ch[m] + .5);
+  let t = rnd() * w.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < 3; i++) { t -= w[i]; if (t <= 0) return MOVES[i]; }
+  return 'F';
+}
+const lastBluffed = log => { const l = log[log.length - 1]; return !!l && l.foe.intent !== l.foe.action; };
+const ENEMIES = [
+  {id:'rock', name:'Скала', level:'учебный',
+   tend:'Показывает свой самый заряженный приём.',
+   rule:'Всегда делает то, что показал.',
+   need:3,
+   seen: log => log.filter(l => l.foe.intent === l.foe.action).length,
+   declare: me => argmax(me.ch),
+   act: c => ({m:c.myIntent, forced:true})},
+  {id:'hot', name:'Горячий', level:'средний',
+   tend:'Часто отвечает на твоё намерение.',
+   rule:'Когда удар заряжен до 4 и выше — всегда показывает удар и бьёт им.',
+   need:2,
+   seen: log => log.filter(l => l.foe.ch.S >= 4).length,
+   declare: me => me.ch.S >= 4 ? 'S' : weighted(me.ch),
+   act: c => {
+     if (c.me.ch.S >= 4) return {m:'S', forced:true};
+     return {m: rnd() < .6 ? COUNTER[c.yourIntent] : c.myIntent, forced:false};
+   }},
+  {id:'fox', name:'Лис', level:'хитрый',
+   tend:'Часто показывает одно, а делает другое.',
+   rule:'Никогда не блефует два раунда подряд.',
+   need:2,
+   seen: log => log.filter((l, i) => i > 0 && log[i - 1].foe.intent !== log[i - 1].foe.action).length,
+   declare: me => weighted(me.ch),
+   act: c => {
+     if (lastBluffed(G.log)) return {m:c.myIntent, forced:true};
+     return {m: rnd() < .7 ? COUNTER[COUNTER[c.myIntent]] : c.myIntent, forced:false};
+   }},
+];
+const enemyById = id => ENEMIES.find(e => e.id === id) || ENEMIES[0];
+const ruleKnown = id => !!(S.mem[id] && S.mem[id].known);
+
+function computeAdapt(id){
+  const m = S.mem[id];
+  if (!m || !m.fights) return null;
+  const e = enemyById(id);
+  if (id === 'rock') return {kind:'favorite', move:m.favorite,
+    text:`${e.name} запомнил: в прошлом бою ты чаще всего играл «${LOW[m.favorite]}». Теперь он чаще показывает то, что это бьёт.`};
+  if (m.bluffRate >= .4) return {kind:'distrust',
+    text:`${e.name} заметил, что ты часто меняешь намерение (${pct(m.bluffRate)} раундов), и перестал ему верить.`};
+  if (m.bluffRate <= .2) return {kind:'trust',
+    text:`${e.name} заметил, что ты почти всегда держишь слово (блеф в ${pct(m.bluffRate)} раундов), и теперь чаще отвечает на твоё намерение.`};
+  return {kind:'none', text:`${e.name} не нашёл в твоей прошлой игре явной привычки.`};
+}
+function enemyDeclare(){
+  const e = enemyById(G.enemyId);
+  if (G.adapt && G.adapt.kind === 'favorite' && rnd() < .6) return COUNTER[G.adapt.move];
+  return e.declare(G.foe);
+}
+function enemyAct(){
+  const e = enemyById(G.enemyId);
+  const c = {me:G.foe, myIntent:G.foe.intent, yourIntent:G.you.intent};
+  const r = e.act(c);
+  if (r.forced) return r.m;
+  if (G.adapt && G.adapt.kind === 'trust' && rnd() < .45) return COUNTER[c.yourIntent];
+  if (G.adapt && G.adapt.kind === 'distrust' && rnd() < .45) return c.yourIntent;
+  return r.m;
+}
+
+function sanitize(r){ const o = {...RULES_V1, ...r}; o.start = Math.min(o.start, o.max); o.reset = Math.min(o.reset, o.max); o.parryKeep = Math.min(o.parryKeep, o.max); return o; }
+function maxDamageByRound(r0){
+  const r = sanitize(r0);
+  const best = [0];
+  let cur = new Map([[`${r.start},${r.start},${r.start}`, 0]]);
+  for (let k = 1; k <= r.rounds; k++) {
+    const nx = new Map();
+    for (const [key, v] of cur) {
+      const c = key.split(',').map(Number);
+      for (let j = 0; j < 3; j++) {
+        const g = v + c[j] + r.bonus;
+        const nk = c.map((x, t) => t === j ? (MOVES[j] === 'P' ? r.parryKeep : r.reset) : Math.min(r.max, x + r.growth)).join(',');
+        if (!(nx.get(nk) >= g)) nx.set(nk, g);
+      }
+    }
+    cur = nx;
+    let b = 0; for (const v of cur.values()) b = Math.max(b, v);
+    best.push(b);
+  }
+  return best;
+}
+
+/* ---------- арена: фон ---------- */
+function el(tag, attrs, parent){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+(function buildScene(){
+  const a = $('bgArch');
+  el('path', {d:'M46 40 H78 V160 H46Z M46 40 v-6 h6 v6 h4 v-6 h6 v6 h4 v-6 h6 v6 h4 v-6 h4 v6', fill:'#CBC4BA'}, a);
+  el('path', {d:'M282 40 H314 V160 H282Z M282 40 v-6 h6 v6 h4 v-6 h6 v6 h4 v-6 h6 v6 h4 v-6 h4 v6', fill:'#CBC4BA'}, a);
+  el('rect', {x:0, y:72, width:360, height:90, fill:'#D3CCC3'}, a);
+  let d = '';
+  for (let i = 0; i < 9; i++) { const x = -8 + i * 44; d += `M${x} 158 V100 Q${x + 17} 80 ${x + 34} 100 V158Z`; }
+  el('path', {d, fill:'#BDB6AC', opacity:'.75'}, a);
+  el('rect', {x:0, y:68, width:360, height:5, fill:'#C3BCB2'}, a);
+  for (let i = 0; i < 5; i++) {
+    el('rect', {x:152 - i * 9, y:146 + i * 5, width:56 + i * 18, height:5, fill: i % 2 ? '#CFC8BF' : '#DDD7CF'}, a);
+  }
+  const f = $('bgFloor');
+  el('rect', {x:0, y:170, width:360, height:50, fill:'#D9D3CA'}, f);
+  let ln = '';
+  for (let i = -9; i <= 9; i++) ln += `M${180 + i * 7} 170 L${180 + i * 44} 220 `;
+  [176, 185, 197, 212].forEach(y => ln += `M0 ${y} H360 `);
+  el('path', {d:ln, stroke:'#B9B2A8', 'stroke-width':'.6', fill:'none', opacity:'.7'}, f);
+  const cg = el('g', {transform:'translate(180 198) scale(1 .3)', opacity:'.55'}, f);
+  el('circle', {r:34, fill:'none', stroke:'#9A958E', 'stroke-width':'1.6'}, cg);
+  el('path', {d:'M0 -44 L6 -6 L44 0 L6 6 L0 44 L-6 6 L-44 0 L-6 -6Z', fill:'#C7C2BB', stroke:'#9A958E', 'stroke-width':'1.2'}, cg);
+  const du = $('dust');
+  for (let i = 0; i < 9; i++) {
+    const c = el('circle', {cx: 20 + i * 38, cy: 150 + (i % 3) * 14, r: .9 + (i % 2) * .6, fill:'#F6F3EE', class:'dust'}, du);
+    c.style.animationDelay = (-i * 1.1) + 's';
+  }
+})();
+
+/* ---------- персонажи: скелет + поза ---------- */
+const V = (x, y) => ({x, y});
+const add = (a, b) => ({x:a.x + b.x, y:a.y + b.y});
+const sub = (a, b) => ({x:a.x - b.x, y:a.y - b.y});
+const mul = (a, k) => ({x:a.x * k, y:a.y * k});
+const len = v => Math.hypot(v.x, v.y);
+const rot = (p, deg) => { const r = deg * Math.PI / 180, c = Math.cos(r), s = Math.sin(r); return {x:p.x * c - p.y * s, y:p.x * s + p.y * c}; };
+function ik(a, t, l1, l2, bend){
+  let d = sub(t, a), dist = len(d);
+  const max = l1 + l2 - .01;
+  if (dist > max) { d = mul(d, max / dist); dist = max; }
+  if (dist < .001) dist = .001;
+  const A = Math.acos(Math.max(-1, Math.min(1, (l1 * l1 + dist * dist - l2 * l2) / (2 * l1 * dist))));
+  const ang = Math.atan2(d.y, d.x) + bend * A;
+  return [V(a.x + Math.cos(ang) * l1, a.y + Math.sin(ang) * l1), add(a, d)];
+}
+const poly = pts => 'M' + pts.map(p => p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' L') + 'Z';
+function quad(a, b, wa, wb){
+  const d = sub(b, a), l = len(d) || 1, n = V(-d.y / l, d.x / l);
+  return [add(a, mul(n, wa)), add(b, mul(n, wb)), add(b, mul(n, -wb)), add(a, mul(n, -wa))];
+}
+function facet(a, b, wa, wb){
+  const d = sub(b, a), l = len(d) || 1, n = V(-d.y / l, d.x / l);
+  return [a, b, add(b, mul(n, -wb)), add(a, mul(n, -wa))];
+}
+
+const POSES = {
+  GUARD:{px:0, py:-44, lean:6, head:0, f1x:13, f1y:0, f2x:-14, f2y:0, h1x:18, h1y:-22, h2x:-8, h2y:-20, sw:50, cape:.15},
+  S0:{px:-5, py:-45, lean:-6, head:4, f1x:12, f1y:0, f2x:-16, f2y:0, h1x:2, h1y:-40, h2x:10, h2y:-22, sw:150, cape:.1},
+  S1:{px:32, py:-37, lean:24, head:-6, f1x:50, f1y:0, f2x:1, f2y:0, h1x:44, h1y:-30, h2x:-20, h2y:-26, sw:4, cape:1},
+  P0:{px:-6, py:-42, lean:-8, head:4, f1x:8, f1y:0, f2x:-22, f2y:0, h1x:10, h1y:-40, h2x:-2, h2y:-28, sw:96, cape:.3},
+  P1:{px:18, py:-40, lean:16, head:-4, f1x:34, f1y:0, f2x:-8, f2y:0, h1x:38, h1y:-28, h2x:-14, h2y:-24, sw:12, cape:.8},
+  F0:{px:8, py:-43, lean:10, head:0, f1x:22, f1y:0, f2x:-12, f2y:0, h1x:30, h1y:-30, h2x:-10, h2y:-22, sw:8, cape:.4},
+  F1:{px:-2, py:-34, lean:26, head:-8, f1x:18, f1y:0, f2x:-24, f2y:0, h1x:14, h1y:-10, h2x:-18, h2y:-26, sw:-25, cape:.7},
+  F2:{px:24, py:-40, lean:14, head:-4, f1x:40, f1y:0, f2x:0, f2y:0, h1x:40, h1y:-44, h2x:-16, h2y:-24, sw:62, cape:1},
+  HIT:{px:-16, py:-43, lean:-16, head:10, f1x:-2, f1y:0, f2x:-28, f2y:0, h1x:6, h1y:-26, h2x:-22, h2y:-38, sw:70, cape:0},
+  CLASH:{px:-6, py:-44, lean:-4, head:2, f1x:10, f1y:0, f2x:-18, f2y:0, h1x:16, h1y:-26, h2x:-8, h2y:-20, sw:40, cape:.3},
+  WIN:{px:0, py:-45, lean:0, head:-6, f1x:10, f1y:0, f2x:-12, f2y:0, h1x:8, h1y:-62, h2x:-8, h2y:-18, sw:86, cape:.4},
+  LOSE:{px:-2, py:-28, lean:28, head:14, f1x:14, f1y:0, f2x:-16, f2y:0, h1x:24, h1y:-14, h2x:4, h2y:-8, sw:-80, cape:.2},
+};
+const SEQ = {
+  S:[['S0', 220, 'out'], ['S1', 140, 'in'], ['S1', 200, 'lin'], ['GUARD', 450, 'inout']],
+  P:[['P0', 180, 'out'], ['P0', 180, 'lin'], ['P1', 150, 'in'], ['P1', 180, 'lin'], ['GUARD', 450, 'inout']],
+  F:[['F0', 160, 'out'], ['F1', 190, 'inout'], ['F2', 150, 'in'], ['F2', 180, 'lin'], ['GUARD', 450, 'inout']],
+  HIT:[['HIT', 110, 'out'], ['HIT', 260, 'lin'], ['GUARD', 480, 'inout']],
+  CLASH:[['CLASH', 120, 'out'], ['GUARD', 420, 'inout']],
+};
+const IMPACT = {S:360, P:510, F:500};
+const EASE = {
+  lin: k => k,
+  out: k => 1 - Math.pow(1 - k, 3),
+  in: k => k * k * k,
+  inout: k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2,
+};
+const LOOKS = {
+  hero:{cape:'url(#capeHero)', capeIn:'#C9621F', body:'#3B3B3B', dark:'#252423', light:'#6F6B64', trim:'#F48B3D', slit:'#F6F3EE', acc:'plume'},
+  rock:{cape:'#55514C', capeIn:'#3A3734', body:'#4A4642', dark:'#2B2927', light:'#8A857D', trim:'#9A958E', slit:'#E8E2DA', acc:'great'},
+  hot:{cape:'#3B3B3B', capeIn:'#232221', body:'#393634', dark:'#222120', light:'#6F6B64', trim:'#6F6B64', slit:'#F7A25F', acc:'horns'},
+  fox:{cape:'#2F2D2B', capeIn:'#1B1A19', body:'#34312E', dark:'#1F1E1D', light:'#66625C', trim:'#6F6B64', slit:'#D1CBC2', acc:'hood', tattered:true},
+};
+const PARTS = [['cape','cape'],['capeIn','capeIn'],['legB','dark'],['bootB','dark'],['armB','dark'],['tabard','dark'],['torso','body'],['torsoF','light'],['belt','trim'],['legF','body'],['legFF','light'],['bootF','dark'],['head','body'],['headF','light'],['acc','acc'],['visor','slit'],['paul','body'],['paulF','light'],['armF','body'],['armFF','light'],['hilt','dark'],['guard','trim'],['blade','#D6D1C9'],['bladeE','#F6F3EE']];
+
+class Fighter {
+  constructor(root, shadow, look){
+    this.root = root; this.shadow = shadow; this.p = {...POSES.GUARD};
+    this.el = {};
+    PARTS.forEach(([k]) => { this.el[k] = el('path', {}, root); });
+    this.setLook(look);
+    this.segs = []; this.seg = null; this.phase = Math.random() * 6;
+  }
+  setLook(id){
+    this.lookId = id; const L = LOOKS[id];
+    PARTS.forEach(([k, c]) => {
+      const fill = c === 'acc' ? (id === 'hero' ? L.trim : L.dark) : (L[c] || c);
+      this.el[k].setAttribute('fill', fill);
+    });
+    this.el.bladeE.setAttribute('opacity', '.8');
+  }
+  play(list){
+    this.segs = list.map(([name, d, e]) => ({to:POSES[name], d:Math.max(1, d * TS), e}));
+    this.nextSeg(performance.now());
+  }
+  snap(name){ this.segs = []; this.seg = null; this.p = {...POSES[name]}; }
+  nextSeg(now){
+    const s = this.segs.shift();
+    this.seg = s ? {...s, from:{...this.p}, t0:now} : null;
+  }
+  update(now){
+    if (this.seg) {
+      const k = Math.min(1, (now - this.seg.t0) / this.seg.d);
+      const e = EASE[this.seg.e](k), a = this.seg.from, b = this.seg.to, p = {};
+      for (const key in b) p[key] = a[key] + (b[key] - a[key]) * e;
+      this.p = p;
+      if (k >= 1) this.nextSeg(now);
+    }
+    this.draw(now / 1000);
+  }
+  chest(){ return V(this.p.px + 6, this.p.py - 22); }
+  draw(t){
+    const q = {...this.p}, L = LOOKS[this.lookId];
+    if (!reduce) {
+      const b = Math.sin(t * 1.9 + this.phase);
+      q.py += b * .7; q.h1y += Math.sin(t * 1.9 + this.phase + .6) * .9; q.sw += b * 1.5;
+    }
+    const P = V(q.px, q.py);
+    const R = v => add(P, rot(v, q.lean));
+    const neck = R(V(1, -36)), sF = R(V(3, -32)), sB = R(V(-4, -33));
+    const hipF = add(P, V(2, 1)), hipB = add(P, V(-3, 1));
+    const [kF, fF] = ik(hipF, V(q.f1x, q.f1y), 23, 23, -1);
+    const [kB, fB] = ik(hipB, V(q.f2x, q.f2y), 23, 23, -1);
+    const hF = add(P, V(q.h1x, q.h1y)), hB = add(P, V(q.h2x, q.h2y));
+    const [eF, wF] = ik(sF, hF, 14, 14, 1);
+    const [eB, wB] = ik(sB, hB, 14, 14, 1);
+    const E = this.el;
+
+    const trail = q.cape, w = k => Math.sin(t * 2.6 + this.phase + k) * (1.6 + trail * 1.8);
+    const cb = [neck, add(sB, V(-2, -1)), add(P, V(-14 - trail * 16 + w(0), -12)), add(P, V(-22 - trail * 28 + w(1), 12 + w(2) * .5))];
+    if (L.tattered) cb.push(add(P, V(-19 - trail * 24 + w(3), 22)), add(P, V(-16 - trail * 22, 14)), add(P, V(-12 - trail * 20 + w(4), 24)));
+    else cb.push(add(P, V(-12 - trail * 20 + w(4), 19 + w(5) * .4)));
+    cb.push(add(P, V(-5, 6)));
+    E.cape.setAttribute('d', poly(cb));
+    E.capeIn.setAttribute('d', poly([neck, add(P, V(-12 - trail * 14 + w(0), -10)), add(P, V(-11 - trail * 18 + w(4), 17)), add(P, V(-5, 6))]));
+
+    E.legB.setAttribute('d', poly(quad(hipB, kB, 5, 4.2)) + poly(quad(kB, fB, 4.2, 3.3)));
+    E.bootB.setAttribute('d', poly([add(fB, V(-3, .5)), add(fB, V(8, .5)), add(fB, V(1, -6))]));
+    E.armB.setAttribute('d', poly(quad(sB, eB, 3.8, 3.2)) + poly(quad(eB, wB, 3.2, 2.6)));
+
+    const tl = q.lean * .3, T = v => add(P, rot(v, tl));
+    E.tabard.setAttribute('d', poly([T(V(-8, -1)), T(V(8, -1)), T(V(11, 13)), T(V(2, 15)), T(V(-9, 12))]));
+    E.torso.setAttribute('d', poly([V(-8, 1), V(8, 1), V(10, -14), V(9, -30), V(3, -36), V(-3, -36), V(-9, -31), V(-10, -16)].map(R)));
+    E.torsoF.setAttribute('d', poly([V(1, -2), V(8, 1), V(10, -14), V(9, -30), V(3, -24)].map(R)));
+    E.belt.setAttribute('d', poly([V(-9, -3), V(9, -3), V(9.4, 1), V(-9.4, 1)].map(R)));
+
+    E.legF.setAttribute('d', poly(quad(hipF, kF, 5.4, 4.4)) + poly(quad(kF, fF, 4.4, 3.5)));
+    E.legFF.setAttribute('d', poly(facet(hipF, kF, 5.4, 4.4)) + poly(facet(kF, fF, 4.4, 3.5)));
+    E.bootF.setAttribute('d', poly([add(fF, V(-3, .5)), add(fF, V(9, .5)), add(fF, V(1, -6.5))]));
+
+    const hc = R(V(2, -45)), hr = q.lean * .5 + q.head, H = v => add(hc, rot(v, hr));
+    const helm = L.acc === 'great'
+      ? [V(-8, -11), V(7, -11), V(9.5, -4), V(9.5, 7), V(-8, 7)]
+      : [V(-7, -9), V(3, -10), V(8, -5), V(8.5, 4), V(1, 9), V(-7, 6)];
+    E.head.setAttribute('d', poly(helm.map(H)));
+    E.headF.setAttribute('d', poly((L.acc === 'great' ? [V(1, -11), V(7, -11), V(9.5, -4), V(9.5, 7), V(3, 7)] : [V(3, -10), V(8, -5), V(8.5, 4), V(2, 1)]).map(H)));
+    E.visor.setAttribute('d', poly(quad(H(V(1.5, -2)), H(V(8.6, -2)), .9, .9)));
+    let acc = '';
+    if (L.acc === 'plume') acc = poly([V(-5, -8), V(-17, -15), V(-12, -8.5), V(-19, -4), V(-6, -3)].map(H));
+    if (L.acc === 'great') acc = poly([V(-3, -11), V(1, -16), V(5, -11)].map(H));
+    if (L.acc === 'horns') acc = poly([V(-3, -9), V(-12, -20), V(-6, -10)].map(H)) + poly([V(3, -10), V(4.5, -22), V(8, -8.5)].map(H));
+    if (L.acc === 'hood') acc = poly([V(-7, -8), V(-18, 0), V(-7, 4)].map(H)) + poly([V(-6, -9), V(-1, -16), V(4, -10)].map(H));
+    E.acc.setAttribute('d', acc);
+
+    const ps = L.acc === 'great' ? 1.5 : 1;
+    const PL = v => add(sF, rot(mul(v, ps), q.lean));
+    E.paul.setAttribute('d', poly([V(-6, -2), V(5, -4), V(8, 2), V(4, 5), V(-5, 4)].map(PL)));
+    E.paulF.setAttribute('d', poly([V(-6, -2), V(5, -4), V(8, 2), V(0, 0)].map(PL)));
+    E.armF.setAttribute('d', poly(quad(sF, eF, 4, 3.4)) + poly(quad(eF, wF, 3.4, 2.8)));
+    E.armFF.setAttribute('d', poly(facet(sF, eF, 4, 3.4)) + poly(facet(eF, wF, 3.4, 2.8)));
+
+    const a = q.sw * Math.PI / 180, dir = V(Math.cos(a), -Math.sin(a)), n = V(-dir.y, dir.x);
+    const base = add(wF, mul(dir, 4)), pom = add(wF, mul(dir, -5)), near = add(wF, mul(dir, 42)), tip = add(wF, mul(dir, 49));
+    E.hilt.setAttribute('d', poly(quad(pom, base, 1.6, 1.6)));
+    E.guard.setAttribute('d', poly(quad(add(base, mul(n, -6)), add(base, mul(n, 6)), 1.5, 1.5)));
+    E.blade.setAttribute('d', poly([add(base, mul(n, 2)), add(near, mul(n, 1.6)), tip, add(near, mul(n, -1.6)), add(base, mul(n, -2))]));
+    E.bladeE.setAttribute('d', poly([base, near, tip, add(near, mul(n, 1.6)), add(base, mul(n, 2))]));
+
+    this.shadow.setAttribute('cx', (q.px + 1).toFixed(1));
+  }
+}
+
+const FY = new Fighter($('figY'), $('shY'), 'hero');
+const FF = new Fighter($('figF'), $('shF'), 'rock');
+const FIG = {you:FY, foe:FF};
+(function loop(now){ FY.update(now); FF.update(now); requestAnimationFrame(loop); })(performance.now());
+
+function sparkAt(x, y){
+  $('sparkPos').setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
+  restartAnim($('spark'), 'go');
+}
+function worldChest(who){
+  const c = FIG[who].chest();
+  return who === 'you' ? V(120 + c.x, 200 + c.y) : V(240 - c.x, 200 + c.y);
+}
+
+/* ---------- состояние боя ---------- */
+let G = null, U = null, skipFn = null;
+const freshU = () => ({revealed:false, breath:{}, outcome:null});
+function side(r){ return {hp:r.hp, ch:{S:r.start, P:r.start, F:r.start}, intent:null, action:null}; }
+
+function newFight(enemyId){
+  const r = sanitize(S.rules);
+  S.last = enemyId; saveSettings();
+  G = {rules:r, enemyId, round:1, phase:'intent', you:side(r), foe:side(r), log:[], adapt:computeAdapt(enemyId)};
+  U = freshU(); skipFn = null;
+  FF.setLook(enemyId);
+  FY.snap('GUARD'); FF.snap('GUARD');
+  closeAll(); render();
+}
+
+function onMove(m){
+  if (!G) return;
+  if (G.phase === 'intent') {
+    G.you.intent = m; G.foe.intent = enemyDeclare(); G.phase = 'action'; render();
+  } else if (G.phase === 'action') {
+    G.you.action = m; G.foe.action = enemyAct(); G.phase = 'reveal'; runReveal();
+  }
+}
+
+function grow(s, won){
+  const r = G.rules, out = {};
+  MOVES.forEach(m => {
+    const before = s.ch[m];
+    const used = won && m === 'P' ? r.parryKeep : r.reset;
+    s.ch[m] = m === s.action ? used : Math.min(r.max, before + r.growth);
+    out[m] = s.ch[m] > before ? 'inhale' : (s.ch[m] < before ? 'exhale' : '');
+  });
+  return out;
+}
+function waitOrTap(ms){
+  return new Promise(res => {
+    const t = setTimeout(done, reduce ? 700 : ms);
+    function done(){ clearTimeout(t); skipFn = null; res(); }
+    skipFn = done;
+  });
+}
+function restartAnim(e, cls){ e.classList.remove(cls); void e.getBoundingClientRect(); e.classList.add(cls); }
+function pop(who, text, cls=''){
+  const e = document.createElement('div');
+  e.className = 'pop ' + cls;
+  e.textContent = text;
+  e.style.left = who === 'you' ? '33%' : '67%';
+  $('stage').appendChild(e);
+  setTimeout(() => e.remove(), 1500);
+}
+
+async function runReveal(){
+  const g = G, y = G.you, f = G.foe, r = G.rules;
+  const rec = {round:G.round, you:{intent:y.intent, action:y.action, ch:{...y.ch}}, foe:{intent:f.intent, action:f.action, ch:{...f.ch}}, winner:null, dmg:0, bonus:false};
+  if (y.action !== f.action) {
+    const youWin = BEATS[y.action] === f.action;
+    rec.winner = youWin ? 'you' : 'foe';
+    const w = youWin ? y : f;
+    rec.bonus = w.intent === w.action && r.bonus > 0;
+    rec.dmg = w.ch[w.action] + (w.intent === w.action ? r.bonus : 0);
+  }
+  U.revealed = false; render();
+  await sleep(380); if (G !== g) return;
+  U.revealed = true; renderIntents(); renderMoves(); renderHint();
+  await sleep(300); if (G !== g) return;
+
+  FY.play(SEQ[y.action]); FF.play(SEQ[f.action]);
+  const impact = rec.winner ? IMPACT[G[rec.winner].action] : IMPACT[y.action];
+  await sleep(impact); if (G !== g) return;
+
+  if (rec.winner) {
+    const loser = rec.winner === 'you' ? 'foe' : 'you';
+    FIG[loser].play(SEQ.HIT);
+    const c = worldChest(loser); sparkAt(c.x, c.y);
+    G[loser].hp -= rec.dmg;
+    $('flash').style.setProperty('--c', rec.winner === 'you' ? 'var(--acc)' : 'var(--t4)');
+    restartAnim($('flash'), 'go');
+    pop(loser, '−' + rec.dmg, loser === 'foe' ? 'you' : '');
+    if (rec.bonus) pop(rec.winner, `+${r.bonus} за слово`, rec.winner === 'you' ? 'note acc' : 'note');
+    if (y.intent !== y.action && rec.winner === 'you') pop('you', 'блеф сработал', 'note acc');
+    if (f.intent !== f.action && rec.winner === 'you') pop('foe', 'пойман', 'note');
+    if (f.intent !== f.action && rec.winner === 'foe') pop('foe', 'блеф', 'note');
+  } else {
+    FY.play(SEQ.CLASH); FF.play(SEQ.CLASH);
+    sparkAt(180, 200 + Math.min(FY.p.py, FF.p.py) - 18);
+    pop('you', '0'); pop('foe', '0');
+  }
+  renderHUD();
+  await sleep(520); if (G !== g) return;
+
+  U.breath = grow(y, rec.winner === 'you'); grow(f, rec.winner === 'foe');
+  G.log.push(rec); U.outcome = rec;
+  const e = enemyById(G.enemyId);
+  if (!ruleKnown(G.enemyId) && e.seen(G.log) >= e.need) {
+    S.mem[G.enemyId] = {...(S.mem[G.enemyId] || {fights:0, w:0, l:0, d:0}), known:true};
+    saveSettings();
+    pop('foe', 'привычка раскрыта', 'note acc');
+  }
+  render();
+
+  await waitOrTap(1900); if (G !== g) return;
+  const over = G.round >= r.rounds || y.hp <= 0 || f.hp <= 0;
+  if (over) { endFight(); return; }
+  G.round++;
+  y.intent = y.action = f.intent = f.action = null;
+  G.phase = 'intent'; U = freshU(); render();
+}
+
+function outcomeText(rec){
+  const y = rec.you, f = rec.foe, parts = [];
+  if (!rec.winner) parts.push(`Оба сыграли «${LOW[y.action]}» — клинки встретились, урона нет.`);
+  else {
+    const w = rec[rec.winner], base = w.ch[w.action];
+    const how = rec.bonus ? ` (${base} + ${G.rules.bonus} за сдержанное слово)` : '';
+    parts.push(`${VERB[w.action]}. ${rec.winner === 'you' ? 'Соперник теряет' : 'Ты теряешь'} ${rec.dmg}${how}.`);
+    if (w.action === 'P' && G.rules.parryKeep > G.rules.reset) parts.push(`Выигравшее парирование сохраняет силу ${G.rules.parryKeep}.`);
+  }
+  if (f.intent !== f.action) parts.push(`Соперник блефовал: показал ${LOW[f.intent]}, сыграл ${LOW[f.action]}.`);
+  if (y.intent !== y.action && rec.winner) parts.push(rec.winner === 'you' ? 'Твой блеф сработал.' : 'Твой блеф не сработал.');
+  return parts.join(' ');
+}
+
+function endFight(){
+  G.phase = 'over';
+  const y = G.you, f = G.foe, log = G.log, n = log.length;
+  const res = y.hp > f.hp ? 'win' : (y.hp < f.hp ? 'lose' : 'draw');
+  FY.play(res === 'win' ? [['WIN', 500, 'out']] : res === 'lose' ? [['LOSE', 600, 'out']] : [['GUARD', 300, 'out']]);
+  FF.play(res === 'lose' ? [['WIN', 500, 'out']] : res === 'win' ? [['LOSE', 600, 'out']] : [['GUARD', 300, 'out']]);
+  const myBluffs = log.filter(l => l.you.intent !== l.you.action);
+  const foeBluffs = log.filter(l => l.foe.intent !== l.foe.action);
+  const cnt = {S:0, P:0, F:0}; log.forEach(l => cnt[l.you.action]++);
+  const favorite = argmax(cnt);
+  const prev = S.mem[G.enemyId] || {fights:0, w:0, l:0, d:0};
+  S.mem[G.enemyId] = {...prev, fights:prev.fights + 1, w:prev.w + (res === 'win'), l:prev.l + (res === 'lose'), d:prev.d + (res === 'draw'), bluffRate: n ? myBluffs.length / n : 0, favorite};
+  saveSettings();
+  const next = computeAdapt(G.enemyId);
+  const e = enemyById(G.enemyId);
+  const title = {win:'Победа!', lose:'Поражение', draw:'Ничья'}[res];
+  const sub = {win:'Ты оказался сильнее в этой дуэли.', lose:`${e.name} прочитал тебя лучше.`, draw:'Никто не уступил.'}[res];
+  const pair = s => `<span class="pair ${s.intent !== s.action ? 'bl' : ''}">${glyph(s.intent)}</span><span class="pair ar">→</span><span class="pair">${glyph(s.action)}</span>`;
+  const rows = log.map(l => `<tr><td>${l.round}</td><td>${pair(l.you)}</td><td>${pair(l.foe)}</td><td>${l.winner ? (l.winner === 'you' ? `−${l.dmg} сопернику` : `−${l.dmg} тебе`) : 'ничья'}${l.bonus ? ' · слово' : ''}</td></tr>`).join('');
+  $('endBody').innerHTML = `
+    <div class="end-head">${res === 'win' ? glyph('crown') : ''}<div class="big" id="endTitle">${title}</div><div class="end-sub">${sub}</div></div>
+    <div class="score">
+      <div><span class="lab">${glyph('heart')}Ты<b>${y.hp} / ${G.rules.hp}</b></span><div class="hb"><i style="width:${Math.max(0, y.hp) / G.rules.hp * 100}%"></i></div></div>
+      <div><span class="lab">${glyph('heart')}${e.name}<b>${f.hp} / ${G.rules.hp}</b></span><div class="hb"><i style="width:${Math.max(0, f.hp) / G.rules.hp * 100}%;background:var(--text)"></i></div></div>
+    </div>
+    <div class="stats">
+      <div><span>Твоих блефов</span><span>${myBluffs.length} из ${n}, сработали ${myBluffs.filter(l => l.winner === 'you').length}</span></div>
+      <div><span>Блефов соперника</span><span>${foeBluffs.length}, ты поймал ${foeBluffs.filter(l => l.winner === 'you').length}</span></div>
+      <div><span>Сдержал слово и выиграл обмен</span><span>${log.filter(l => l.winner === 'you' && l.bonus).length}</span></div>
+    </div>
+    <h3>Журнал боя · показал → сыграл</h3>
+    <div class="log-wrap"><table class="log"><thead><tr><th>Р.</th><th>Ты</th><th>${e.name}</th><th>Итог</th></tr></thead><tbody>${rows}</tbody></table></div>
+    ${next ? `<p class="foe-card"><span class="a" style="margin:0">В реванше: ${next.text}</span></p>` : ''}`;
+  render();
+  setTimeout(() => { if (G && G.phase === 'over') $('ovEnd').hidden = false; }, 900 * TS);
+}
+
+/* ---------- отрисовка интерфейса ---------- */
+function render(){
+  if (!G) return;
+  renderHUD(); renderHistory(); renderIntents(); renderMoves(); renderHint();
+  if (!$('ovFoe').hidden) renderFoeInfo();
+}
+
+function renderHUD(){
+  const y = G.you.hp, f = G.foe.hp, H = G.rules.hp, R = G.rules.rounds;
+  $('hpY').textContent = Math.max(0, y); $('hpF').textContent = Math.max(0, f); $('hpMY').textContent = H; $('hpMF').textContent = H;
+  $('barY').style.width = Math.max(0, y) / H * 100 + '%';
+  $('barF').style.width = Math.max(0, f) / H * 100 + '%';
+  $('rnd').textContent = G.phase === 'over' ? R : G.round;
+  $('lead').hidden = !S.view.lead;
+  const lead = y - f, w = Math.min(50, Math.abs(lead) / H * 100);
+  const fill = $('tugFill');
+  fill.style.left = (lead > 0 ? 50 - w : 50) + '%';
+  fill.style.width = w + '%';
+  fill.style.background = lead > 0 ? 'linear-gradient(90deg,var(--acc-b),var(--acc-a))' : 'var(--text)';
+  $('tugLead').textContent = lead === 0 ? 'Поровну' : (lead > 0 ? `+${lead} у тебя` : `+${-lead} у соперника`);
+  const e = enemyById(G.enemyId);
+  $('foeName').textContent = e.name;
+  const showDecl = G.phase === 'action' || G.phase === 'reveal';
+  $('foeCh').innerHTML = MOVES.map(m => `<span class="chip ${showDecl && G.foe.intent === m ? 'declared' : ''}" title="${NAME[m]}: сила ${G.foe.ch[m]}">${glyph(m)}${G.foe.ch[m]}</span>`).join('');
+}
+
+function renderFoeInfo(){
+  const e = enemyById(G.enemyId), m = S.mem[e.id], known = ruleKnown(e.id);
+  $('foeInfoTitle').textContent = e.name;
+  const rec = m && m.fights ? `${m.fights} · побед ${m.w}, поражений ${m.l}${m.d ? `, ничьих ${m.d}` : ''}` : 'первая встреча';
+  $('foeInfo').innerHTML = `
+    <div class="row"><span>Уровень</span><span>${e.level[0].toUpperCase() + e.level.slice(1)}</span></div>
+    <div class="row"><span>Склонность</span><span>${e.tend}</span></div>
+    <div class="row"><span>Привычка</span><span class="${known ? 'on' : 'hidden'}">${known ? e.rule : 'Не раскрыта. Он никогда её не нарушает — заметь её пару раз в бою, и она откроется.'}</span></div>
+    ${G.adapt ? `<div class="row"><span>После прошлого боя</span><span>${G.adapt.text}</span></div>` : ''}
+    <div class="row"><span>Встреч</span><span>${rec}</span></div>`;
+}
+
+function cell(s, rec, who){
+  if (!rec) return `<div class="cell empty"></div>`;
+  const won = rec.winner === who, lost = rec.winner && !won, bluff = s.intent !== s.action;
+  const t = `${who === 'you' ? 'Ты' : 'Соперник'}: показал ${LOW[s.intent]}, сыграл ${LOW[s.action]}`;
+  return `<div class="cell ${won ? 'won-' + who : ''} ${lost ? 'lost' : ''}" title="${t}">${glyph(s.action)}${bluff ? `<span class="was">${glyph(s.intent)}</span>` : ''}${won ? `<span class="dmg">${rec.dmg}</span>` : ''}</div>`;
+}
+function renderHistory(){
+  const R = G.rules.rounds, cur = G.phase === 'over' ? R + 1 : G.round;
+  let cols = [];
+  if (S.view.fullHistory) cols = Array.from({length:R}, (_, i) => i + 1);
+  else for (let n = Math.max(1, cur - 3); n <= Math.min(cur, R); n++) cols.push(n);
+  const byRound = {}; G.log.forEach(l => byRound[l.round] = l);
+  $('hist').innerHTML = `<div class="hlab"><span>Соп.</span><span>Ты</span><span></span></div>` +
+    cols.map(n => { const rec = byRound[n];
+      return `<div class="hcol ${n === cur ? 'now' : ''}">${cell(rec && rec.foe, rec, 'foe')}${cell(rec && rec.you, rec, 'you')}<span class="hn2">${n}</span></div>`; }).join('');
+}
+
+function renderIntents(){
+  const ph = G.phase;
+  ['you', 'foe'].forEach(w => {
+    const s = G[w], box = $('ib-' + w);
+    const shown = s.intent && ph !== 'intent';
+    box.querySelector('.slot1 .sv').innerHTML = shown
+      ? `${glyph(s.intent)}<span>${NAME[s.intent]}</span>`
+      : `<span class="muted">${w === 'you' ? 'выбери приём' : 'скрыто'}</span>`;
+    box.querySelector('.slot1').classList.toggle('active', w === 'you' && ph === 'intent');
+    box.querySelector('.slot2').classList.toggle('active', w === 'you' && ph === 'action');
+    box.classList.toggle('bluff', (ph === 'reveal' && U.revealed || ph === 'over') && !!s.action && s.action !== s.intent);
+    const cd = box.querySelector('.card');
+    cd.querySelector('.front').innerHTML = s.action ? glyph(s.action) : '';
+    cd.classList.toggle('flipped', (ph === 'reveal' && U.revealed) || (ph === 'over' && !!s.action));
+  });
+}
+
+function renderMoves(){
+  const y = G.you, r = G.rules, ph = G.phase;
+  $('moves').innerHTML = MOVES.map((m, i) => {
+    const ch = y.ch[m];
+    const declared = y.intent === m && ph === 'action';
+    const chosen = ph === 'reveal' && y.action === m && U.revealed;
+    const dim = ph === 'reveal' && y.action !== m;
+    let big = ch, lab = 'сила', plus = '';
+    if (ph === 'action' && S.view.showDamage) {
+      big = ch + (declared ? r.bonus : 0); lab = 'урон при победе';
+      if (declared && r.bonus) plus = `<em>+${r.bonus}</em>`;
+    }
+    const pips = Array.from({length:r.max}, (_, k) => `<i class="${k < ch ? 'on' : ''}"></i>`).join('');
+    const disabled = ph === 'reveal' || ph === 'over';
+    const cls = ['mv', ch >= r.max && !disabled ? 'full' : '', declared ? 'declared' : '', chosen ? 'chosen' : '', dim ? 'dim' : '', U.breath[m] || ''].join(' ');
+    return `<button type="button" class="${cls}" data-m="${m}" style="--ch:${Math.min(ch, 8)}" ${disabled ? 'disabled' : ''} aria-label="${NAME[m]}, сила ${ch}">
+      <span class="idx">0${i + 1}</span>${declared ? `<span class="eye">${glyph('eye')}</span>` : '<span class="plus">+</span>'}
+      ${glyph(m, 'big-g')}
+      <span class="mn">${NAME[m]}</span>
+      <span class="pw"><b>${big}</b>${plus}</span>
+      <span class="pl">${lab}</span>
+      <span class="pips">${pips}</span>
+    </button>`;
+  }).join('');
+}
+
+function renderHint(){
+  const h = $('hint'), p = $('hintText'), r = G.rules;
+  h.classList.toggle('res', G.phase === 'reveal' && !!U.outcome);
+  const pvTip = S.view.preview ? ' · зажми приём — увидишь исходы' : '';
+  if (G.phase === 'intent') p.innerHTML = `Покажи приём, который собираешься сыграть. Соперник покажет свой одновременно.<small>Удар бьёт финт · финт обманывает парирование · парирование ловит удар${pvTip}</small>`;
+  else if (G.phase === 'action') p.innerHTML = r.bonus
+    ? `Сохрани намерение: <b>+${r.bonus} к урону</b>, если выиграешь обмен. Или смени приём — соперник показал <b>${LOW[G.foe.intent]}</b>.<small>Нажми «${NAME[G.you.intent]}» ещё раз, чтобы сдержать слово${pvTip}</small>`
+    : `Соперник показал <b>${LOW[G.foe.intent]}</b>. Сыграй показанный приём или смени его.<small>${pvTip.slice(3)}</small>`;
+  else if (G.phase === 'reveal') p.innerHTML = U.outcome ? `${outcomeText(U.outcome)}<small>Нажми здесь или на арену, чтобы продолжить</small>` : (U.revealed ? 'Приёмы раскрыты — смотри на арену.' : 'Карты легли рубашкой вверх…');
+  else p.innerHTML = 'Бой окончен. Реванш — и соперник вспомнит, как ты играл.';
+}
+
+function renderFoesPanel(){
+  const r = sanitize(S.rules);
+  const t = m => `<span class="t">${glyph(m)}${NAME[m]}</span>`;
+  $('rulesMini').innerHTML = `
+    <div class="tri">${t('S')} бьёт ${t('F')}</div>
+    <div class="tri">${t('F')} обманывает ${t('P')}</div>
+    <div class="tri">${t('P')} ловит ${t('S')}</div>
+    <p>Каждый раунд оба сначала показывают намерение, потом тайно делают настоящий ход. Сдержал слово и выиграл обмен — +${r.bonus} к урону. Неиспользованные приёмы копят силу до ${r.max}, использованный падает до ${r.reset}${r.parryKeep > r.reset ? `, а выигравшее парирование — только до ${r.parryKeep}` : ''}. После ${r.rounds} раундов побеждает тот, у кого больше здоровья.</p>
+    <p>У каждого соперника есть склонность и одна жёсткая привычка, которую он никогда не нарушает. Заметь её пару раз в бою — и она откроется.</p>`;
+  $('foesList').innerHTML = ENEMIES.map(e => {
+    const m = S.mem[e.id];
+    const rec = m && m.fights ? `${m.w}–${m.l}${m.d ? '–' + m.d : ''}` : 'не встречались';
+    const a = computeAdapt(e.id);
+    return `<button type="button" class="foe-card ${G && G.enemyId === e.id ? 'cur' : ''}" data-e="${e.id}">
+      <b>${e.name}</b><span class="rec">${rec}</span>
+      <span class="h">${e.level[0].toUpperCase() + e.level.slice(1)}. ${e.tend} ${ruleKnown(e.id) ? `<b class="hk">Привычка: ${e.rule}</b>` : 'Привычка не раскрыта.'}</span>
+      ${a ? `<span class="a">${a.text}</span>` : ''}
+    </button>`;
+  }).join('') + `<button type="button" class="linkish" id="forget">Стереть память соперников</button>`;
+}
+
+function renderBalance(){
+  const r = S.rules, best = maxDamageByRound(r), sr = sanitize(r), R = sr.rounds;
+  let ko = null;
+  for (let k = 1; k <= R; k++) if (best[k] >= sr.hp) { ko = k; break; }
+  const status = ko === null
+    ? `<span class="ok">Нокаута нет вообще: бой всегда идёт ${R} раундов.</span>`
+    : ko === R
+      ? `<span class="ok">Нокаут возможен только в последнем раунде — бой всегда доигрывается.</span>`
+      : `<span class="warn">Нокаут возможен уже в ${ko}-м раунде — бой может закончиться раньше.</span>`;
+  const changed = G && JSON.stringify(sr) !== JSON.stringify(G.rules);
+  $('balBody').innerHTML = `
+    <h3>Правила боя</h3>
+    <div>${RULE_DEFS.map(d => `<div class="st"><span class="sl">${d.label}${d.note ? `<small>${d.note}</small>` : ''}</span>
+      <div class="ctl"><button type="button" class="sb" data-k="${d.key}" data-d="-1" aria-label="${d.label}: меньше">−</button>
+      <output id="rv-${d.key}" class="${r[d.key] !== RULES_V1[d.key] ? 'chg' : ''}">${r[d.key]}</output>
+      <button type="button" class="sb" data-k="${d.key}" data-d="1" aria-label="${d.label}: больше">+</button></div></div>`).join('')}</div>
+    <div class="inv">
+      <span>Максимум урона одного бойца: за ${R - 1} р. — <b>${best[R - 1]}</b>, за ${R} — <b>${best[R]}</b>. Здоровье <b>${sr.hp}</b>.</span>
+      ${status}
+      <span class="note">Перебор всех состояний зарядов, если боец выигрывает каждый обмен и всегда держит слово.</span>
+    </div>
+    <p class="note">${changed ? 'Правила изменены — применятся в новом бою.' : 'Оранжевым — отличается от версии 1.1.'}</p>
+    <h3>Вид</h3>
+    <div>${VIEW_DEFS.map(d => `<label class="sw"><input type="checkbox" id="v-${d.key}" data-v="${d.key}" ${S.view[d.key] ? 'checked' : ''}><span>${d.label}<small>${d.note}</small></span></label>`).join('')}</div>`;
+}
+
+function closeAll(){ ['ovFoes', 'ovEnd', 'ovBal', 'ovFoe'].forEach(id => $(id).hidden = true); }
+$('foeName').addEventListener('click', e => { e.stopPropagation(); if (!G) return; renderFoeInfo(); $('ovFoe').hidden = false; });
+$('btnSwitch').addEventListener('click', () => { closeAll(); renderFoesPanel(); $('ovFoes').hidden = false; });
+
+function previewHTML(m){
+  const y = G.you, f = G.foe, r = G.rules, ph = G.phase;
+  const rows = MOVES.map(e => {
+    const shown = ph === 'action' && f.intent === e;
+    let cls, res, note = '';
+    if (m === e) { cls = 'd'; res = 'ничья'; }
+    else if (BEATS[m] === e) {
+      cls = 'w'; res = `+${y.ch[m] + (ph === 'action' && y.intent === m ? r.bonus : 0)} ему`;
+      if (m === 'P' && r.parryKeep > r.reset) note = `<small>парирование сохранит силу ${r.parryKeep}</small>`;
+    } else { cls = 'l'; res = `−${f.ch[e] + (shown ? r.bonus : 0)} тебе`; }
+    return `<div class="pr ${cls}">${glyph(e)}<span>против: ${LOW[e]}${shown ? '<em>показал</em>' : ''}</span><b>${res}</b>${note}</div>`;
+  }).join('');
+  const foot = ph === 'intent' ? 'Без бонусов за слово — намерения ещё не показаны.' : (y.intent === m ? `С учётом +${r.bonus} за сдержанное слово.` : 'Ты меняешь намерение — бонуса не будет.');
+  return `<h4>${NAME[m]} — исходы</h4>${rows}<div class="pvn">${foot}</div>`;
+}
+let lpTimer = null, lpFired = false;
+function showPreview(btn){
+  if (!S.view.preview || !G || (G.phase !== 'intent' && G.phase !== 'action')) return;
+  const pv = $('pv'), wrap = pv.parentElement;
+  pv.innerHTML = previewHTML(btn.dataset.m);
+  pv.hidden = false;
+  const W = wrap.clientWidth, w = pv.offsetWidth;
+  const cx = btn.offsetLeft + btn.offsetWidth / 2;
+  const left = Math.max(0, Math.min(W - w, cx - w / 2));
+  pv.style.left = left + 'px';
+  pv.style.setProperty('--ax', (cx - left) + 'px');
+}
+function hidePreview(){ clearTimeout(lpTimer); $('pv').hidden = true; }
+$('moves').addEventListener('pointerdown', e => {
+  const b = e.target.closest('.mv'); if (!b || b.disabled) return;
+  lpFired = false; clearTimeout(lpTimer);
+  if (e.pointerType !== 'mouse') lpTimer = setTimeout(() => { lpFired = true; showPreview(b); }, 330);
+});
+['pointerup', 'pointercancel'].forEach(t => $('moves').addEventListener(t, e => { if (e.pointerType !== 'mouse') hidePreview(); }));
+$('moves').addEventListener('pointerover', e => { if (e.pointerType !== 'mouse') return; const b = e.target.closest('.mv'); if (b && !b.disabled) showPreview(b); });
+$('moves').addEventListener('pointerleave', hidePreview);
+$('moves').addEventListener('contextmenu', e => { if (e.target.closest('.mv')) e.preventDefault(); });
+$('moves').addEventListener('click', e => {
+  const b = e.target.closest('.mv');
+  if (lpFired) { lpFired = false; return; }
+  if (b && !b.disabled) { hidePreview(); onMove(b.dataset.m); }
+});
+$('hint').addEventListener('click', () => { if (skipFn) skipFn(); });
+$('stage').addEventListener('click', () => { if (skipFn) skipFn(); });
+$('btnFoes').addEventListener('click', () => { renderFoesPanel(); $('ovFoes').hidden = false; });
+$('btnBal').addEventListener('click', () => { renderBalance(); $('ovBal').hidden = false; });
+document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => { $(b.dataset.close).hidden = true; }));
+document.querySelectorAll('.ov').forEach(o => o.addEventListener('click', e => { if (e.target === o && o.id !== 'ovEnd') o.hidden = true; }));
+$('foesList').addEventListener('click', e => {
+  if (e.target.id === 'forget') { S.mem = {}; saveSettings(); if (G) G.adapt = null; renderFoesPanel(); render(); return; }
+  const c = e.target.closest('.foe-card'); if (c) newFight(c.dataset.e);
+});
+$('btnRematch').addEventListener('click', () => newFight(G.enemyId));
+$('btnOther').addEventListener('click', () => { closeAll(); renderFoesPanel(); $('ovFoes').hidden = false; });
+$('balBody').addEventListener('click', e => {
+  const b = e.target.closest('.sb'); if (!b) return;
+  const d = RULE_DEFS.find(x => x.key === b.dataset.k);
+  S.rules[d.key] = Math.max(d.min, Math.min(d.max, S.rules[d.key] + Number(b.dataset.d)));
+  saveSettings(); renderBalance();
+});
+$('balBody').addEventListener('change', e => {
+  const k = e.target.dataset && e.target.dataset.v; if (!k) return;
+  S.view[k] = e.target.checked; saveSettings(); render();
+});
+$('balApply').addEventListener('click', () => newFight(G ? G.enemyId : 'rock'));
+$('balReset').addEventListener('click', () => { S.rules = {...RULES_V1}; S.view = {...VIEW_V1}; saveSettings(); renderBalance(); render(); });
+
+function boot(data){
+  if (data && data.G && data.G.phase !== 'reveal' && data.G.phase !== 'over') {
+    G = data.G; G.rules = sanitize(G.rules); U = freshU(); FF.setLook(G.enemyId); render();
+  } else newFight(S.last || 'rock');
+}
+try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({G: G ? clone(G) : null})); } catch(e) {}
+if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(boot);
+else boot((window.claude && window.claude.hot && window.claude.hot.data) || {});
+})();
+</script>

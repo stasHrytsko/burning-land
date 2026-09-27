@@ -1,3 +1,11 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Сгенерировано tools/build.sh из src/game.html — правьте исходник. -->
+</head>
+<body>
 <title>Выдержка</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +21,7 @@
   --font-b:"Roboto","Segoe UI",system-ui,-apple-system,sans-serif;
 }
 html,body{height:100%}
-body{
+body{margin:0;
   background-color:var(--bg);
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .23 0 0 0 0 .2 0 0 0 0 .17 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   color:var(--text);font-family:var(--font-b);font-size:14px;line-height:1.4;-webkit-tap-highlight-color:transparent;
@@ -1245,3 +1253,6 @@ if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude
 else boot((window.claude && window.claude.hot && window.claude.hot.data) || {});
 })();
 </script>
+
+</body>
+</html>
