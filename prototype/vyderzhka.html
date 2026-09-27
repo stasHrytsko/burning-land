@@ -75,6 +75,60 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc-b);outline-
 .habit.on .gl{color:var(--acc-b)}
 .foe-card .hk{color:var(--ink);font-weight:500}
 
+.shud{position:absolute;left:0;right:0;top:0;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;align-items:start;padding:8px 10px 0;pointer-events:none}
+.shud .side{display:flex;flex-direction:column;gap:4px;min-width:0}
+.shud .side.foe{align-items:flex-end}
+.shud .nm{font-family:var(--font-d);font-weight:700;font-size:16px;line-height:1.1;color:var(--ink);background:rgba(246,243,238,.78);border-radius:4px;padding:1px 7px;align-self:flex-start}
+.shud .side.foe .nm{align-self:flex-end}
+.foe-btn{pointer-events:auto;border:1px solid var(--t2);display:flex;align-items:center;gap:5px}
+.foe-btn::after{content:"i";font-family:var(--font-b);font-size:10px;font-weight:700;width:14px;height:14px;border-radius:50%;background:var(--t4);color:var(--paper);display:grid;place-items:center;line-height:1}
+.foe-btn:hover{border-color:var(--t4)}
+.hprow{display:flex;align-items:center;gap:6px;width:100%;max-width:150px}
+.side.foe .hprow{justify-content:flex-end}
+.bar2{flex:1;height:6px;background:rgba(111,107,100,.35);border-radius:2px;overflow:hidden;box-shadow:0 0 0 1px rgba(246,243,238,.6)}
+.bar2 i{display:block;height:100%;transition:width .5s}
+.side.you .bar2 i{background:linear-gradient(90deg,var(--acc-a),var(--acc-b))}
+.side.foe .bar2{transform:scaleX(-1)}
+.side.foe .bar2 i{background:var(--text)}
+.hpn{font-family:var(--font-d);font-size:11px;color:var(--t4);font-variant-numeric:tabular-nums;white-space:nowrap;text-shadow:0 1px 0 var(--paper)}
+.hpn b{font-size:14px;color:var(--ink)}
+.shud .mid{display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:3px}
+.shud .dia{width:38px;height:38px;background:rgba(246,243,238,.85)}
+.shud .dia small{font-size:7.5px}
+.shud .dia b{font-size:14px}
+.shud .lead{display:flex;flex-direction:column;align-items:center;gap:1px;width:78px;font-family:var(--font-d);font-size:10px;font-weight:700;color:var(--ink);text-align:center;line-height:1.1;text-shadow:0 1px 0 var(--paper)}
+.shud .lead .tugbar{width:100%;height:5px}
+.shud .fch{margin-top:1px}
+.shud .chip{font-size:11px;padding:1px 4px 1px 2px;background:rgba(246,243,238,.85)}
+.shud .chip .gl{width:12px;height:12px}
+
+.legend{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;font-family:var(--font-d);font-size:12.5px;color:var(--t4)}
+.legend::after{display:none}
+.lg{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+.lg b{display:inline-flex;align-items:center;gap:4px;color:var(--ink);font-weight:700}
+.lg .gl{width:14px;height:14px}
+
+.slots{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sl{position:relative;border:1px solid var(--t2);border-radius:4px;background:rgba(255,255,255,.45);min-height:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:14px 4px 5px;transition:border-color .2s,box-shadow .2s}
+.sl .sn{position:absolute;top:3px;left:6px;font-family:var(--font-d);font-weight:700;font-size:11px;color:var(--t3)}
+.sl small{font-size:9px;color:var(--t4);text-transform:uppercase;letter-spacing:.06em}
+.sl.active{border-color:var(--acc);box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 25%,transparent);background:#FFF8F1}
+.sl.active .sn{color:var(--acc-b)}
+.sv{display:flex;flex-direction:column;align-items:center;gap:2px;font-family:var(--font-d);font-size:12px;font-weight:500;color:var(--ink);text-align:center;line-height:1.1;min-height:36px;justify-content:center}
+.sv .gl{width:22px;height:22px}
+.ibox.foe .sv .gl{color:var(--acc-b)}
+.sv .muted{color:var(--t3);font-weight:400;font-size:11.5px}
+.sl .blf{display:none;position:absolute;top:3px;right:4px;background:var(--ink);color:var(--paper);font-size:8.5px;font-weight:700;letter-spacing:.08em;padding:1px 4px;border-radius:3px;text-transform:uppercase}
+.ibox.bluff .slot1{animation:crack .45s}
+.ibox.bluff .slot1 .blf{display:block}
+.ibox.bluff .slot1 .sv{opacity:.55;text-decoration:line-through;text-decoration-thickness:1.5px}
+.slot2 .card{width:32px;height:40px}
+.foe-info{display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--text)}
+.foe-info .row{display:flex;flex-direction:column;gap:2px;padding-bottom:7px;border-bottom:1px dashed var(--t2)}
+.foe-info .row span:first-child{font-family:var(--font-d);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--t4)}
+.foe-info .hidden{color:var(--t3)}
+.foe-info .on{color:var(--ink);font-weight:500}
+
 .moves-wrap{position:relative}
 .pv{position:absolute;bottom:calc(100% + 8px);width:min(250px,100%);z-index:5;background:var(--ink);color:var(--paper);border-radius:6px;padding:9px 10px 8px;box-shadow:0 10px 26px rgba(33,33,33,.3);pointer-events:none}
 .pv::after{content:"";position:absolute;top:100%;left:var(--ax,50%);margin-left:-6px;border:6px solid transparent;border-top-color:var(--ink)}
@@ -125,9 +179,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc-b);outline-
 .flash{position:absolute;inset:0;background:var(--c,#fff);opacity:0;pointer-events:none;mix-blend-mode:multiply}
 .flash.go{animation:flash .45s ease-out}
 @keyframes flash{0%{opacity:.28}100%{opacity:0}}
-.pop{position:absolute;top:20%;transform:translateX(-50%);font-family:var(--font-d);font-weight:700;font-size:26px;color:var(--ink);text-shadow:0 1px 0 var(--paper),0 0 10px var(--paper);animation:popup 1.4s forwards;pointer-events:none;white-space:nowrap}
+.pop{position:absolute;top:30%;transform:translateX(-50%);font-family:var(--font-d);font-weight:700;font-size:26px;color:var(--ink);text-shadow:0 1px 0 var(--paper),0 0 10px var(--paper);animation:popup 1.4s forwards;pointer-events:none;white-space:nowrap}
 .pop.you{color:var(--acc-b)}
-.pop.note{font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-shadow:none;background:var(--ink);color:var(--paper);padding:2px 7px;border-radius:3px;top:8%}
+.pop.note{font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-shadow:none;background:var(--ink);color:var(--paper);padding:2px 7px;border-radius:3px;top:24%}
 .pop.note.acc{background:var(--acc-b)}
 @keyframes popup{0%{opacity:0;transform:translate(-50%,8px)}14%{opacity:1;transform:translate(-50%,0)}78%{opacity:1}100%{opacity:0;transform:translate(-50%,-14px)}}
 .stage-tag{position:absolute;left:8px;bottom:6px;font-family:var(--font-d);font-size:9.5px;letter-spacing:.14em;color:var(--t4);text-transform:uppercase;pointer-events:none}
@@ -139,7 +193,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc-b);outline-
 .ps{margin-left:auto;font-size:11px;color:var(--t4);text-align:right;line-height:1.25;max-width:42%}
 
 .intents{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.ibox{padding:8px 10px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;align-items:center}
+.ibox{padding:8px 10px;display:grid;grid-template-columns:1fr;gap:6px;align-items:center}
 .ibox.foe{background:color-mix(in srgb,var(--acc-soft) 55%,var(--panel))}
 .ibox::after{display:none}
 .il{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t4)}
@@ -309,26 +363,6 @@ table.log{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeri
     </div>
   </header>
 
-  <section class="hud pan tugmode" id="hud" aria-label="Состояние боя">
-    <div class="hs you">
-      <div class="hn"><svg class="gl" aria-hidden="true"><use href="#g-star"/></svg>Ты</div>
-      <div class="hpv"><b id="hpY">40</b> / <span id="hpMY">40</span></div>
-      <div class="hb"><i id="barY"></i></div>
-    </div>
-    <div class="hc"><div class="dia"><div><small>Раунд</small><b id="rnd">1/10</b></div></div></div>
-    <div class="hs foe">
-      <div class="hn" id="foeName">Скала</div>
-      <div class="hpv"><b id="hpF">40</b> / <span id="hpMF">40</span></div>
-      <div class="hb"><i id="barF"></i></div>
-      <div class="fch" id="foeCh"></div>
-    </div>
-    <div class="tug" id="tug">
-      <div class="tugbar"><i id="tugFill"></i><i class="mid"></i></div>
-      <div class="tuglead" id="tugLead">Поровну</div>
-    </div>
-    <div class="foe-line" id="foeLine"></div>
-  </section>
-
   <section class="hist pan" aria-label="История раундов">
     <div class="hist-top"><span class="sec">История</span><small>зачёркнуто — показал, но сменил</small></div>
     <div class="hrow" id="hist"></div>
@@ -363,20 +397,43 @@ table.log{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeri
     </svg>
     <div class="flash" id="flash"></div>
     <div class="stage-tag">Janken inspired · tactical duel</div>
+    <div class="shud" aria-label="Состояние боя">
+      <div class="side you">
+        <div class="nm">Я</div>
+        <div class="hprow"><div class="bar2"><i id="barY"></i></div><span class="hpn"><b id="hpY">45</b>/<span id="hpMY">45</span></span></div>
+      </div>
+      <div class="mid">
+        <div class="dia"><div><small>Раунд</small><b id="rnd">1</b></div></div>
+        <div class="lead" id="lead" hidden><div class="tugbar"><i id="tugFill"></i><i class="mid"></i></div><span id="tugLead">Поровну</span></div>
+      </div>
+      <div class="side foe">
+        <button type="button" class="nm foe-btn" id="foeName" aria-label="Карточка соперника">Скала</button>
+        <div class="hprow"><span class="hpn"><b id="hpF">45</b>/<span id="hpMF">45</span></span><div class="bar2"><i id="barF"></i></div></div>
+        <div class="fch" id="foeCh"></div>
+      </div>
+    </div>
   </section>
 
-  <section class="phase pan" id="phase" aria-live="polite"></section>
+  <section class="legend pan" aria-label="Кто кого бьёт">
+    <div class="lg"><b><svg class="gl" aria-hidden="true"><use href="#g-S"/></svg>Удар</b> бьёт <b><svg class="gl" aria-hidden="true"><use href="#g-F"/></svg>Финт</b></div>
+    <div class="lg"><b><svg class="gl" aria-hidden="true"><use href="#g-F"/></svg>Финт</b> обманывает <b><svg class="gl" aria-hidden="true"><use href="#g-P"/></svg>Парирование</b></div>
+    <div class="lg"><b><svg class="gl" aria-hidden="true"><use href="#g-P"/></svg>Парирование</b> ловит <b><svg class="gl" aria-hidden="true"><use href="#g-S"/></svg>Удар</b></div>
+  </section>
 
   <section class="intents">
     <div class="ibox pan you" id="ib-you">
       <div class="il">Твоё намерение <svg class="gl" aria-hidden="true"><use href="#g-eye"/></svg></div>
-      <div class="iv"></div>
-      <div class="fin"><div class="card"><div class="cin"><div class="face back">?</div><div class="face front"></div></div></div><small>итог</small></div>
+      <div class="slots">
+        <div class="sl slot1"><span class="sn">1</span><span class="blf">блеф</span><div class="sv"></div><small>показал</small></div>
+        <div class="sl slot2"><span class="sn">2</span><div class="card"><div class="cin"><div class="face back">?</div><div class="face front"></div></div></div><small>сыграл</small></div>
+      </div>
     </div>
     <div class="ibox pan foe" id="ib-foe">
       <div class="il">Намерение соперника <svg class="gl" aria-hidden="true"><use href="#g-eye"/></svg></div>
-      <div class="iv"></div>
-      <div class="fin"><div class="card"><div class="cin"><div class="face back">?</div><div class="face front"></div></div></div><small>итог</small></div>
+      <div class="slots">
+        <div class="sl slot1"><span class="sn">1</span><span class="blf">блеф</span><div class="sv"></div><small>показал</small></div>
+        <div class="sl slot2"><span class="sn">2</span><div class="card"><div class="cin"><div class="face back">?</div><div class="face front"></div></div></div><small>сыграл</small></div>
+      </div>
     </div>
   </section>
 
@@ -393,6 +450,14 @@ table.log{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeri
     <div class="ph-row"><h2 id="foesTitle">Выбери соперника</h2><button class="x" type="button" data-close="ovFoes" aria-label="Закрыть">×</button></div>
     <div class="rules-mini" id="rulesMini"></div>
     <div class="foes" id="foesList"></div>
+  </div>
+</div>
+
+<div class="ov" id="ovFoe" hidden>
+  <div class="panel" role="dialog" aria-labelledby="foeInfoTitle">
+    <div class="ph-row"><h2 id="foeInfoTitle">Соперник</h2><button class="x" type="button" data-close="ovFoe" aria-label="Закрыть">×</button></div>
+    <div class="foe-info" id="foeInfo"></div>
+    <div class="btns"><button class="btn alt" type="button" id="btnSwitch">Сменить соперника</button></div>
   </div>
 </div>
 
@@ -429,7 +494,7 @@ const BEATS = {S:'F', P:'S', F:'P'};
 const COUNTER = {S:'P', P:'F', F:'S'};
 const VERB = {S:'Удар бьёт финт', P:'Парирование ловит удар', F:'Финт обманывает парирование'};
 const RULES_V1 = {rounds:10, hp:45, start:2, reset:1, growth:1, max:5, bonus:1, parryKeep:2};
-const VIEW_V1 = {showDamage:true, fullHistory:true, tug:true, preview:true};
+const VIEW_V1 = {showDamage:true, fullHistory:true, lead:false, preview:true};
 const RULE_DEFS = [
   {key:'rounds', label:'Раундов в бою', min:3, max:20},
   {key:'hp', label:'Здоровье', min:5, max:99},
@@ -443,7 +508,7 @@ const RULE_DEFS = [
 const VIEW_DEFS = [
   {key:'showDamage', label:'Урон при победе на кнопках', note:'выкл — только текущая сила'},
   {key:'fullHistory', label:'История всех раундов', note:'выкл — последние 3, как в документе'},
-  {key:'tug', label:'Перевес одной полосой', note:'выкл — две полоски здоровья'},
+  {key:'lead', label:'Полоса перевеса', note:'под ромбом раунда, в дополнение к полоскам здоровья'},
   {key:'preview', label:'Предпросмотр исходов', note:'зажми приём (или наведи мышью) — три исхода против каждого ответа'},
 ];
 
@@ -945,31 +1010,39 @@ function endFight(){
 /* ---------- отрисовка интерфейса ---------- */
 function render(){
   if (!G) return;
-  renderHUD(); renderHistory(); renderPhase(); renderIntents(); renderMoves(); renderHint();
+  renderHUD(); renderHistory(); renderIntents(); renderMoves(); renderHint();
+  if (!$('ovFoe').hidden) renderFoeInfo();
 }
 
 function renderHUD(){
   const y = G.you.hp, f = G.foe.hp, H = G.rules.hp, R = G.rules.rounds;
-  $('hpY').textContent = y; $('hpF').textContent = f; $('hpMY').textContent = H; $('hpMF').textContent = H;
+  $('hpY').textContent = Math.max(0, y); $('hpF').textContent = Math.max(0, f); $('hpMY').textContent = H; $('hpMF').textContent = H;
   $('barY').style.width = Math.max(0, y) / H * 100 + '%';
   $('barF').style.width = Math.max(0, f) / H * 100 + '%';
-  $('rnd').textContent = G.phase === 'over' ? `${R}/${R}` : `${G.round}/${R}`;
-  $('hud').classList.toggle('tugmode', S.view.tug);
-  $('tug').hidden = !S.view.tug;
+  $('rnd').textContent = G.phase === 'over' ? R : G.round;
+  $('lead').hidden = !S.view.lead;
   const lead = y - f, w = Math.min(50, Math.abs(lead) / H * 100);
   const fill = $('tugFill');
   fill.style.left = (lead > 0 ? 50 - w : 50) + '%';
   fill.style.width = w + '%';
   fill.style.background = lead > 0 ? 'linear-gradient(90deg,var(--acc-b),var(--acc-a))' : 'var(--text)';
-  $('tugLead').textContent = lead === 0 ? 'Поровну' : (lead > 0 ? `Ты впереди на ${lead}` : `Соперник впереди на ${-lead}`);
+  $('tugLead').textContent = lead === 0 ? 'Поровну' : (lead > 0 ? `+${lead} у тебя` : `+${-lead} у соперника`);
   const e = enemyById(G.enemyId);
   $('foeName').textContent = e.name;
   const showDecl = G.phase === 'action' || G.phase === 'reveal';
   $('foeCh').innerHTML = MOVES.map(m => `<span class="chip ${showDecl && G.foe.intent === m ? 'declared' : ''}" title="${NAME[m]}: сила ${G.foe.ch[m]}">${glyph(m)}${G.foe.ch[m]}</span>`).join('');
-  const known = ruleKnown(e.id);
-  $('foeLine').innerHTML = `<b>${e.name}</b><span class="lvl">${e.level}</span> ${e.tend}
-    <span class="habit ${known ? 'on' : ''}">${glyph('star')}<span>${known ? `Привычка: ${e.rule}` : 'Привычка не раскрыта — заметь её пару раз, и она откроется'}</span></span>
-    ${G.adapt ? `<span class="adapt">${G.adapt.text}</span>` : ''}`;
+}
+
+function renderFoeInfo(){
+  const e = enemyById(G.enemyId), m = S.mem[e.id], known = ruleKnown(e.id);
+  $('foeInfoTitle').textContent = e.name;
+  const rec = m && m.fights ? `${m.fights} · побед ${m.w}, поражений ${m.l}${m.d ? `, ничьих ${m.d}` : ''}` : 'первая встреча';
+  $('foeInfo').innerHTML = `
+    <div class="row"><span>Уровень</span><span>${e.level[0].toUpperCase() + e.level.slice(1)}</span></div>
+    <div class="row"><span>Склонность</span><span>${e.tend}</span></div>
+    <div class="row"><span>Привычка</span><span class="${known ? 'on' : 'hidden'}">${known ? e.rule : 'Не раскрыта. Он никогда её не нарушает — заметь её пару раз в бою, и она откроется.'}</span></div>
+    ${G.adapt ? `<div class="row"><span>После прошлого боя</span><span>${G.adapt.text}</span></div>` : ''}
+    <div class="row"><span>Встреч</span><span>${rec}</span></div>`;
 }
 
 function cell(s, rec, who){
@@ -989,26 +1062,17 @@ function renderHistory(){
       return `<div class="hcol ${n === cur ? 'now' : ''}">${cell(rec && rec.foe, rec, 'foe')}${cell(rec && rec.you, rec, 'you')}<span class="hn2">${n}</span></div>`; }).join('');
 }
 
-function renderPhase(){
-  const ph = G.phase;
-  const d = {
-    intent:['1', 'Фаза: Намерение', 'Скрыто выбери приём'],
-    action:['2', 'Фаза: Действие', 'Одновременное раскрытие приёмов'],
-    reveal:['2', 'Раскрытие', `Раунд ${G.round} из ${G.rules.rounds}`],
-    over:['✓', 'Бой окончен', 'Итоги — в окне результата'],
-  }[ph];
-  $('phase').innerHTML = `<span class="pn ${ph === 'over' ? 'done' : ''}">${d[0]}</span><span class="pt">${d[1]}</span><span class="ps">${d[2]}</span>`;
-}
-
 function renderIntents(){
   const ph = G.phase;
   ['you', 'foe'].forEach(w => {
     const s = G[w], box = $('ib-' + w);
     const shown = s.intent && ph !== 'intent';
-    box.querySelector('.iv').innerHTML = shown
-      ? `${glyph(s.intent)}<span>${NAME[s.intent]}</span><span class="blf">блеф</span>`
-      : `<span class="muted">${w === 'you' ? 'выбери приём ниже' : 'скрыто'}</span>`;
-    box.classList.toggle('bluff', ph === 'reveal' && U.revealed && s.action && s.action !== s.intent);
+    box.querySelector('.slot1 .sv').innerHTML = shown
+      ? `${glyph(s.intent)}<span>${NAME[s.intent]}</span>`
+      : `<span class="muted">${w === 'you' ? 'выбери приём' : 'скрыто'}</span>`;
+    box.querySelector('.slot1').classList.toggle('active', w === 'you' && ph === 'intent');
+    box.querySelector('.slot2').classList.toggle('active', w === 'you' && ph === 'action');
+    box.classList.toggle('bluff', (ph === 'reveal' && U.revealed || ph === 'over') && !!s.action && s.action !== s.intent);
     const cd = box.querySelector('.card');
     cd.querySelector('.front').innerHTML = s.action ? glyph(s.action) : '';
     cd.classList.toggle('flipped', (ph === 'reveal' && U.revealed) || (ph === 'over' && !!s.action));
@@ -1100,7 +1164,9 @@ function renderBalance(){
     <div>${VIEW_DEFS.map(d => `<label class="sw"><input type="checkbox" id="v-${d.key}" data-v="${d.key}" ${S.view[d.key] ? 'checked' : ''}><span>${d.label}<small>${d.note}</small></span></label>`).join('')}</div>`;
 }
 
-function closeAll(){ ['ovFoes', 'ovEnd', 'ovBal'].forEach(id => $(id).hidden = true); }
+function closeAll(){ ['ovFoes', 'ovEnd', 'ovBal', 'ovFoe'].forEach(id => $(id).hidden = true); }
+$('foeName').addEventListener('click', e => { e.stopPropagation(); if (!G) return; renderFoeInfo(); $('ovFoe').hidden = false; });
+$('btnSwitch').addEventListener('click', () => { closeAll(); renderFoesPanel(); $('ovFoes').hidden = false; });
 
 function previewHTML(m){
   const y = G.you, f = G.foe, r = G.rules, ph = G.phase;
